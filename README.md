@@ -1,12 +1,32 @@
-# React + Vite
+# ScoutingWebsite
+A scouting data collection website made by FRC Team 2158 ausTIN CANs
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-Currently, two official plugins are available:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+# ScoutingWebsite
+A scouting data collection website made by FRC Team 2158 ausTIN CANs
 
-## Expanding the ESLint configuration
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### Todo
+ - [ ] Components
+	 - [ ] Number Input
+	 - [ ] Text Inputgn
+	 - [ ] Slider Input
+	  - [ ] Select Input
+	  - [ ] Multi-Select
+ - [ ] Sections
+ - [ ] Configuration
+ - [ ] UI
+ - [ ] Google Sheets
+	 - [ ] Format data
+	 - [ ] Submit using button to google sheets api
+ - [ ] Low Priority
+	 - [ ] Graphs
+	 - [ ] Individual Team Stats
+	 - [ ] Scoring Capabilities
+	 - [ ] Qualitative Data
+
+ ## Resources and References
+
+ - Zustand, a state management store: https://zustand.docs.pmnd.rs
+ - FRC2713's QRScout: https://github.com/FRC2713/QRScout
