@@ -26,6 +26,7 @@ A scouting data collection website made by FRC Team 2158 ausTIN CANs
 	 - [ ] Scoring Capabilities
 	 - [ ] Qualitative Data
 
- ## Resources
+ ## Resources and References
 
  - Zustand, a state management store: https://zustand.docs.pmnd.rs
+ - FRC2713's QRScout: https://github.com/FRC2713/QRScout
