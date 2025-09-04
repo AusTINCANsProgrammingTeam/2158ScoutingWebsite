@@ -1,4 +1,5 @@
 
+
 # ScoutingWebsite
 A scouting data collection website made by FRC Team 2158 ausTIN CANs
 
@@ -6,8 +7,10 @@ A scouting data collection website made by FRC Team 2158 ausTIN CANs
 ### Todo
  - [ ] Components
 	 - [ ] Number Input
-	 - [ ] Text Input
+	 - [ ] Text Inputgn
 	 - [ ] Slider Input
+	  - [ ] Select Input
+	  - [ ] Multi-Select
  - [ ] Sections
  - [ ] Configuration
  - [ ] UI
