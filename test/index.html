@@ -1,13 +1,209 @@
+<!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title></title>
-        <meta name="description" content="">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="">
-    </head>
-    <body>
-        <script src="/src/js/loader.js"></script>
-    </body>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>ausTIN CANs Scouting</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+
+</head>
+
+<body>
+    <div id="root">
+        <div>
+            <ul class="container">
+                <h1 class="title">ausTIN CANs Scouting</h1>
+                <div class="identification-container">
+                    <h2 class="subtitle section-title">IDENTIFICATION</h2>
+                    <div>
+                        <span class="widget">
+                            <div class="subtitle">Name</div>
+                            <input type="text" class="text-box widget" required="" title="Name" value="">
+                        </span>
+                        <span class="widget">
+                            <div class="subtitle">Match Number</div>
+                            <input type="text" class="text-box widget" required="" title="Match Number" value="1">
+                        </span>
+                    </div>
+                    <div>
+                        <span class="widget">
+                            <div class="subtitle">Team Number</div>
+                            <input type="text" class="text-box widget" required="" title="Team Number" value="">
+                        </span>
+                    </div>
+                </div>
+                <div class="auto-container">
+                    <h2 class="subtitle section-title">AUTONOMOUS</h2>
+                    <div class="style1"><span><span class="widget">
+                                <div class="subtitle">Starting Side</div><select type="dropdown" class="dropdown-auto"
+                                    title="Starting Side">
+                                    <option value="Processor">Processor</option>
+                                    <option value="Center">Center</option>
+                                    <option value="Opposite Processor">Opposite Processor</option>
+                                </select>
+                            </span></span>
+                        <div><span class="widget-auto-counter" value="  -  ">
+                                <div>
+                                    <div><button class="inactive-blue-button">
+                                            <div class="alliance-text">Blue</div>
+                                        </button><button class="inactive-red-button">
+                                            <div class="alliance-text">Red</div>
+                                        </button></div>
+                                </div>
+                                <div class="subtitle">Auto Pieces</div>
+                                <div class="awsome-val-display">
+                                    <div class="val-display" value="" title="Auto Pieces">-</div>
+                                    <div class="undo-button">
+                                        <div class="undo-button-text"><img
+                                                src="./static/media/undo.cde8828f3331d64953b7.png" alt=""
+                                                class="undo-img"></div>
+                                    </div>
+                                </div>
+                                <div class="selector">
+                                    <div class="field-map"></div>
+                                </div>
+                            </span>
+                            <div><span class="widget dissapointmentCheckbox">
+                                    <div class="subtitledissapointmentCheckbox">Leave in Auto</div><input
+                                        type="checkbox" class="checkbox" title="Leave in Auto" value="0">
+                                </span></div>
+                        </div>
+                        <div><span class="widget">
+                                <div class="subtitle">Describe Auto Path</div><textarea type="text"
+                                    class="text-box-long widget" title="Describe Auto Path"></textarea>
+                            </span></div>
+                    </div>
+                </div>
+                <div class="teleop-container">
+                    <h2 class="subtitle section-title">TELEOP</h2><span class="widget-teleop-counter"
+                        value="{&quot;L1&quot;:0,&quot;L2&quot;:0,&quot;L3&quot;:0,&quot;L4&quot;:0,&quot;P&quot;:0,&quot;N&quot;:0,&quot;CF&quot;:0,&quot;NF&quot;:0,&quot;PF&quot;:0,&quot;RA&quot;:0}">
+                        <div class="subtitle">Piece Counter</div>
+                        <div class="teleop-counter-container">
+                            <div class="reef-map">
+                                <div class="teleop-scoring">
+                                    <div class="teleop-reef-scoring"><img
+                                            src="./static/media/reef.0527928df0bb8bd6e3ed.png" alt=""
+                                            class="reef-graphic">
+                                        <div class="teleop-buttons">
+                                            <div class="tele-btn">
+                                                <div class="tele-btn-text">L4</div>
+                                            </div>
+                                            <div class="tele-btn">
+                                                <div class="tele-btn-text">L3</div>
+                                            </div>
+                                            <div class="tele-btn">
+                                                <div class="tele-btn-text">L2</div>
+                                            </div>
+                                            <div class="tele-btn">
+                                                <div class="tele-btn-text">L1</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="remove-algae-teleop">
+                                        <div class="remove-algae-text">Remove Algae</div>
+                                    </div>
+                                </div>
+                                <div class="teleop-misic">
+                                    <div class="teleop-algae-box">
+                                        <div class="processor-btn">
+                                            <div class="processor-btn-text">Processor</div>
+                                        </div>
+                                        <div class="processor-btn">
+                                            <div class="processor-btn-text">Net</div>
+                                        </div>
+                                    </div>
+                                    <div class="teleop-display">
+                                        <div class="teleop-display-text">-</div>
+                                    </div>
+                                    <div class="teleop-score-box">
+                                        <div class="score-btn">
+                                            <div class="score-btn-text">Score</div>
+                                        </div>
+                                        <div class="fumble-btn">
+                                            <div class="fumble-btn-text">Fumble</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="subtitle">Score Log</div>
+                            <div class="log-container">
+                                <div class="log-display-teleop"></div>
+                            </div>
+                        </div>
+                    </span>
+                    <div class="checkboxes1"><span class="widget onstage">
+                            <div class="subtitleonstage">Deep Climb</div><input type="checkbox" class="checkbox"
+                                title="Deep Climb" value="0">
+                        </span><span class="widget onstage">
+                            <div class="subtitleonstage">Shallow Climb</div><input type="checkbox" class="checkbox"
+                                title="Shallow Climb" value="0">
+                        </span><span class="widget onstage">
+                            <div class="subtitleonstage">Climb Failure</div><input type="checkbox" class="checkbox"
+                                title="Climb Failure" value="0">
+                        </span></div>
+                </div>
+                <div class="post-match-container">
+                    <h2 class="subtitle section-title">POST-MATCH</h2>
+                    <div class="checkboxes2">
+                        <div><span class="widget temporary">
+                                <div class="subtitletemporary">Temp. Failure</div><input type="checkbox"
+                                    class="checkbox" title="Temp. Failure" value="0">
+                            </span><span class="widget critical">
+                                <div class="subtitlecritical">Critical Failure</div><input type="checkbox"
+                                    class="checkbox" title="Critical Failure" value="0">
+                            </span></div>
+                        <div><span class="widget critical">
+                                <div class="subtitlecritical">Ground Intake</div><input type="checkbox" class="checkbox"
+                                    title="Ground Intake" value="0">
+                            </span><span class="widget critical">
+                                <div class="subtitlecritical">Station Intake</div><input type="checkbox"
+                                    class="checkbox" title="Station Intake" value="0">
+                            </span></div>
+                        <div><span class="widget onstage">
+                                <div class="subtitleonstage">Defense</div><input type="checkbox" class="checkbox"
+                                    title="Defense" value="0">
+                            </span></div>
+                    </div>
+                    <div><span class="widget">
+                            <div class="subtitle">What they did well</div><textarea type="text"
+                                class="text-box-long widget" title="What they did well" placeholder=""></textarea>
+                        </span></div>
+                    <div><span class="widget">
+                            <div class="subtitle">What they didn't do well</div><textarea type="text"
+                                class="text-box-long widget" title="What they didn't do well" placeholder=""></textarea>
+                        </span></div>
+                    <div><span class="widget">
+                            <div class="subtitle">Additional comments</div><textarea type="text"
+                                class="text-box-long widget" title="Additional comments" placeholder=""></textarea>
+                        </span></div>
+                </div>
+                <!-- Replace with actual link -->
+                <a class="suggestions" href="" target="_blank" rel="noreferrer">Suggestions or Bugs
+                </a>
+                <div class="submit-container">
+                    <button class="widget submit">
+                        <span class="btn-text">Submit</span>
+                    </button>
+                </div>
+                <div class="export-container">
+                    <button class="export widget">
+                        <span class="btn-text">Export Data</span>
+                    </button>
+                    <button class="clear-localstorage widget">
+                        <span class="btn-text">Clear local data</span>
+                    </button>
+                </div>
+            </ul>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+        crossorigin="anonymous"></script>
+</body>
+
 </html>
