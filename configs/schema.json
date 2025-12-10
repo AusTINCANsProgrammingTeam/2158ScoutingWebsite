@@ -1,0 +1,93 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$ref": "#/definitions/Config",
+  "definitions": {
+    "Config": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "page_title": {
+          "type": "string"
+        },
+        "sections": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Section"
+          }
+        }
+      },
+      "required": ["title", "page_title", "sections"],
+      "additionalProperties": false
+    },
+    "Section": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "fields": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/InputProps"
+          }
+        }
+      },
+      "required": ["name", "fields"],
+      "additionalProperties": false
+    },
+    "InputProps": {
+      "type": "object",
+      "preserveDataOnReset": {
+        "type": "boolean",
+        "description": "If true, field data will not be cleared when the scouting form is reset."
+      },
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/InputTypes"
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "code": {
+          "type": "string"
+        },
+        "disabled": {
+          "type": "boolean"
+        },
+        "value": {},
+        "choices": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "defaultValue": {},
+        "min": {
+          "type": "number"
+        },
+        "max": {
+          "type": "number"
+        }
+      },
+      "required": ["title", "type", "required", "code"],
+      "additionalProperties": false
+    },
+    "InputTypes": {
+      "type": "string",
+      "enum": [
+        "text",
+        "number",
+        "boolean",
+        "range",
+        "select",
+        "counter",
+        "image"
+      ]
+    }
+  }
+}

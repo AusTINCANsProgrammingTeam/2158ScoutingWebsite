@@ -1,0 +1,297 @@
+{
+    "$schema": "./schema.json",
+    "title": "QRScout",
+    "page_title": "Reefscape",
+    "sections": [
+      {
+        "name": "Prematch",
+        "preserveDataOnReset": true,
+        "fields": [
+          {
+            "title": "Scouter Initials",
+            "type": "text",
+            "required": true,
+            "code": "scouter",
+            "defaultValue": ""
+          },
+          {
+            "title": "Match Number",
+            "type": "number",
+            "required": true,
+            "code": "matchNumber",
+            "defaultValue": "0"
+          },
+          {
+            "title": "Robot",
+            "type": "select",
+            "required": true,
+            "code": "robot",
+            "choices": {
+              "R1": "Red 1",
+              "R2": "Red 2",
+              "R3": "Red 3",
+              "B1": "Blue 1",
+              "B2": "Blue 2",
+              "B3": "Blue 3"
+            },
+            "defaultValue": "R1"
+          },
+          {
+            "title": "Team Number",
+            "type": "number",
+            "required": true,
+            "code": "teamNumber",
+            "defaultValue": "0"
+          },
+          {
+            "title": "No Show",
+            "type": "boolean",
+            "defaultValue": false,
+            "required": false,
+            "code": "noShow"
+          }
+        ]
+      },
+      {
+        "name": "Autonomous",
+        "fields": [
+          {
+            "code": "aucor1",
+            "title": "L1 Coral Scored",
+            "type": "counter",
+            "defaultValue": 0,
+            "min": 0,
+            "required": false
+          },
+          {
+            "code": "aucor2",
+            "title": "L2 Coral Scored",
+            "type": "counter",
+            "defaultValue": 0,
+            "min": 0,
+            "required": false
+          },
+          {
+            "code": "aucor3",
+            "title": "L3 Coral Scored",
+            "type": "counter",
+            "defaultValue": 0,
+            "min": 0,
+            "required": false
+          },
+          {
+            "code": "aucor4",
+            "title": "L4 Coral Scored",
+            "type": "counter",
+            "defaultValue": 0,
+            "min": 0,
+            "required": false
+          },{
+            "code": "aumcor4",
+            "title": "L4 Coral Missed",
+            "type": "counter",
+            "defaultValue": 0,
+            "min": 0,
+            "required": false
+          },
+          {
+            "code": "aualgp",
+            "title": "Algae Scored Processor",
+            "type": "counter",
+            "defaultValue": 0,
+            "min": 0,
+            "required": false
+          },
+          {
+            "code": "aualgn",
+            "title": "Algae Scored Net",
+            "type": "counter",
+            "defaultValue": 0,
+            "min": 0,
+            "required": false
+          },
+          {
+            "code": "auf",
+            "title": "Auto Foul",
+            "type": "boolean",
+            "defaultValue": false,
+            "required": false
+          },
+          {
+            "code": "aul",
+            "title": "Auto Leave",
+            "type": "boolean",
+            "defaultValue": false,
+            "required": false
+          }
+        ]
+      },
+      {
+        "name": "Teleop",
+        "fields": [
+            {
+                "code": "tcor1",
+                "title": "L1 Coral Scored",
+                "type": "counter",
+                "defaultValue": 0,
+                "min": 0,
+                "required": false
+              },
+              {
+                "code": "tcor2",
+                "title": "L2 Coral Scored",
+                "type": "counter",
+                "defaultValue": 0,
+                "min": 0,
+                "required": false
+              },
+              {
+                "code": "tcor3",
+                "title": "L3 Coral Scored",
+                "type": "counter",
+                "defaultValue": 0,
+                "min": 0,
+                "required": false
+              },
+              {
+                "code": "tcor4",
+                "title": "L4 Coral Scored",
+                "type": "counter",
+                "defaultValue": 0,
+                "min": 0,
+                "required": false
+              },{
+                "code": "tmcor4",
+                "title": "L4 Coral Missed",
+                "type": "counter",
+                "defaultValue": 0,
+                "min": 0,
+                "required": false
+              },
+              {
+                "code": "talgp",
+                "title": "Algae Scored Processor",
+                "type": "counter",
+                "defaultValue": 0,
+                "min": 0,
+                "required": false
+              },
+              {
+                "code": "talgn",
+                "title": "Algae Scored Net",
+                "type": "counter",
+                "defaultValue": 0,
+                "min": 0,
+                "required": false
+              }
+        ]
+      },
+      {
+        "name": "Endgame",
+        "fields": [
+          {
+            "title": "End Position",
+            "type": "select",
+            "required": true,
+            "code": "epo",
+            "choices": {
+              "No": "No Climb",
+              "Pr": "Parked",
+              "Sh": "Shallow / Low Cage",
+              "Os": "Deep / High Cage"
+            },
+            "defaultValue": "No Climb"
+          },
+          {
+            "title": "Coral Pickup Location",
+            "type": "select",
+            "required": true,
+            "code": "Npl",
+            "choices": {
+              "N": "None",
+              "G": "Ground",
+              "S": "Source",
+              "B": "Both"
+            },
+            "defaultValue": "None"
+          },
+          {
+            "title": "Algae Pickup Location",
+            "type": "select",
+            "required": true,
+            "code": "Np2",
+            "choices": {
+              "X": "None",
+              "G": "Ground",
+              "R": "Reef",
+              "B": "Both"
+            },
+            "defaultValue": "None"
+          }
+        ]
+      },
+      {
+        "name": "Postmatch",
+        "fields": [
+          {
+            "code": "Fou/Tech",
+            "title": "Foul",
+            "type": "counter",
+            "defaultValue": 0,
+            "required": false
+          },
+          {
+            "code": "d",
+            "title": "Died",
+            "type": "boolean",
+            "defaultValue": false,
+            "required": false
+          },
+          {
+            "code": "to",
+            "title": "Tipped Over",
+            "type": "boolean",
+            "defaultValue": false,
+            "required": false
+          },
+          {
+            "code": "yc",
+            "title": "Yellow/Red Card",
+            "type": "boolean",
+            "defaultValue": false,
+            "required": false
+          },
+          {
+            "title": "Offense Skill",
+            "type": "range",
+            "required": false,
+            "code": "or",
+            "defaultValue": 3,
+            "min": 1,
+            "max": 5,
+            "step": 1
+          },
+          {
+            "title": "Defense Skill",
+            "type": "range",
+            "required": false,
+            "code": "dr",
+            "defaultValue": 3,
+            "min": 1,
+            "max": 5,
+            "step": 1
+          },
+          {
+            "code": "co",
+            "title": "Comments",
+            "type": "text",
+            "min": 0,
+            "max": 50,
+            "required": false,
+            "defaultValue": ""
+          }
+        ]
+      }
+    ]
+  }
+  
