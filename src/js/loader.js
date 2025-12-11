@@ -22,7 +22,8 @@ document.addEventListener('DOMContentLoaded', async function () {
 function render(config) {
   // console.log(config["sections"][0]["fields"]);
   var form = document.getElementsByClassName("formBody")[0]
-  
+  form.onsubmit = submitFunction;
+
   config.sections.forEach(section => {
     const sectionDiv = document.createElement("div");
     sectionDiv.className = "row center clearfix border-bottom content-style1";
