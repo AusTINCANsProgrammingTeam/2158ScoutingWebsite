@@ -1,77 +1,82 @@
-// Source - https://stackoverflow.com/a
-// Posted by some user, modified by community. See post 'Timeline' for change history
-// Retrieved 2025-12-10, License - CC BY-SA 4.0
-window.onload = function () {
-  console.log(render(config));
-}
+
+document.addEventListener('DOMContentLoaded', function() {
+  let submitDiv = document.createElement("div");
+  submitDiv.className = "container mt-3 mb-3";
+  let submit = document.createElement("input");
+  submit.type = "submit";
+  submit.className = "btn btn-primary d-block mt-2";
+  submitDiv.appendChild(submit);
+  document.getElementsByClassName("formBody")[0].appendChild(render(config));
+  document.getElementsByClassName("formBody")[0].appendChild(submitDiv);
+});
 
 const config = {
   sections: [
     {
-        "name": "Autonomous",
-        "fields": [
-          {
-            "code": "aucor1",
-            "title": "L1 Coral Scored",
-            "type": "spinbox",
-            "defaultValue": 0,
-            "min": 0,
-          },
-          {
-            "code": "aucor2",
-            "title": "L2 Coral Scored",
-            "type": "spinbox",
-            "defaultValue": 0,
-            "min": 0,
-          },
-          {
-            "code": "aucor3",
-            "title": "L3 Coral Scored",
-            "type": "spinbox",
-            "defaultValue": 0,
-            "min": 0,
-          },
-          {
-            "code": "aucor4",
-            "title": "L4 Coral Scored",
-            "type": "spinbox",
-            "defaultValue": 0,
-            "min": 0,
-          },{
-            "code": "aumcor4",
-            "title": "L4 Coral Missed",
-            "type": "spinbox",
-            "defaultValue": 0,
-            "min": 0,
-          },
-          {
-            "code": "aualgp",
-            "title": "Algae Scored Processor",
-            "type": "spinbox",
-            "defaultValue": 0,
-            "min": 0,
-          },
-          {
-            "code": "aualgn",
-            "title": "Algae Scored Net",
-            "type": "spinbox",
-            "defaultValue": 0,
-            "min": 0,
-          },
-          {
-            "code": "auf",
-            "title": "Auto Foul",
-            "type": "checkbox",
-            "defaultValue": false,
-          },
-          {
-            "code": "aul",
-            "title": "Auto Leave",
-            "type": "checkbox",
-            "defaultValue": false,
-          }
-        ]
-      }
+      "name": "Autonomous",
+      "fields": [
+        {
+          "code": "aucor1",
+          "title": "L1 Coral Scored",
+          "type": "spinbox",
+          "defaultValue": 0,
+          "min": 0,
+        },
+        {
+          "code": "aucor2",
+          "title": "L2 Coral Scored",
+          "type": "spinbox",
+          "defaultValue": 0,
+          "min": 0,
+        },
+        {
+          "code": "aucor3",
+          "title": "L3 Coral Scored",
+          "type": "spinbox",
+          "defaultValue": 0,
+          "min": 0,
+        },
+        {
+          "code": "aucor4",
+          "title": "L4 Coral Scored",
+          "type": "spinbox",
+          "defaultValue": 0,
+          "min": 0,
+        }, {
+          "code": "aumcor4",
+          "title": "L4 Coral Missed",
+          "type": "spinbox",
+          "defaultValue": 0,
+          "min": 0,
+        },
+        {
+          "code": "aualgp",
+          "title": "Algae Scored Processor",
+          "type": "spinbox",
+          "defaultValue": 0,
+          "min": 0,
+        },
+        {
+          "code": "aualgn",
+          "title": "Algae Scored Net",
+          "type": "spinbox",
+          "defaultValue": 0,
+          "min": 0,
+        },
+        {
+          "code": "auf",
+          "title": "Auto Foul",
+          "type": "checkbox",
+          "defaultValue": false,
+        },
+        {
+          "code": "aul",
+          "title": "Auto Leave",
+          "type": "checkbox",
+          "defaultValue": false,
+        }
+      ]
+    }
   ]
 }
 
@@ -79,42 +84,48 @@ function render(config) {
   // console.log(config["sections"][0]["fields"]);
   var form = document.createElement("form");
 
-  Object.values(config).forEach(sections => {
-    var section = document.createElement("div");
-    section.class = "container border-bottom";
-    var sectionTitle = document.createElement("h4");
-    sectionTitle.innerText = sections["name"];
-    section.appendChild(sectionTitle);
-    console.log(sections)
+  config.sections.forEach(section => {
+    const sectionDiv = document.createElement("div");
+    sectionDiv.className = "container border-bottom";
 
-    Object.values(sections[0]["fields"]).forEach(field => {
+    const sectionTitle = document.createElement("h4");
+    sectionTitle.innerText = section.name;
+    sectionDiv.appendChild(sectionTitle);
+
+    section.fields.forEach(field => {
       console.log(field);
       switch (field.type) {
         case "text":
-          createTextBox(field["code"], field["title"], field["defaultValue"], field["required"]);
+          sectionDiv.appendChild(createTextBox(field["code"], field["title"], field["defaultValue"], field["required"]))
+          break
         case "number":
-          createNumberInput(field["code"], field["title"], field["defaultValue"]);
+          sectionDiv.appendChild(createNumberInput(field["code"], field["title"], field["defaultValue"]))
+          break
         case "checkbox":
-          createCheckBox(
+          sectionDiv.appendChild(createCheckBox(
             field["code"], field["title"],
             (field["defaultValue"] == undefined) ? false : field["defaultValue"]
-          );
+          ))
+          break
         case "range":
-          createRangeBox(field["code"], field["title"],
+          sectionDiv.appendChild(createRangeBox(field["code"], field["title"],
             (field["min"] == undefined) ? 0 : field["min"],
             (field["max"] == undefined) ? 10 : field["max"],
             (field["defaultValue"] == undefined) ? min : field["defaultValue"],
-            (field["step"] == undefined) ? 1 : field["step"]);
+            (field["step"] == undefined) ? 1 : field["step"]))
+          break
         case "select":
-          createSelectBox(field["code"], field["title"], field["choices"], field["defaultValue"]);
+          sectionDiv.appendChild(createSelectBox(field["code"], field["title"], field["choices"], field["defaultValue"]))
+          break
         case "spinbox":
-          createSpinBox(field["code"], field["title"],
+          sectionDiv.appendChild(createSpinBox(field["code"], field["title"],
             field["min"] == undefined ? 0 : field["min"],
             field["max"] == undefined ? 10 : field["max"],
-            field["step"] == undefined ? 1 : field["step"]);
+            field["step"] == undefined ? 1 : field["step"]))
+          break
       }
     })
-    form.appendChild(section);
+    form.appendChild(sectionDiv);
   })
   return form;
 }
@@ -136,7 +147,7 @@ function createSpinBox(id, title, min, max, step, value) {
   decrementButton.type = "button";
   decrementButton.innerText = "-";
   decrementButton.dataset.field = id;
-  decrementButton.addEventListener("click", decrementValue(decrementButton));
+  decrementButton.addEventListener("click", () => decrementValue(decrementButton, min, step));
   spinBox.append(decrementButton);
 
   const num = document.createElement("input"); // TODO: replace with bootstrap spinbox
@@ -146,6 +157,8 @@ function createSpinBox(id, title, min, max, step, value) {
   num.step = step;
   num.value = value;
   num.id = id;
+  num.value = min;
+  num.name = id;
   spinBox.append(num);
 
   let incrementButton = document.createElement("button");
@@ -153,7 +166,7 @@ function createSpinBox(id, title, min, max, step, value) {
   incrementButton.type = "button";
   incrementButton.innerText = "+";
   incrementButton.dataset.field = id;
-  incrementButton.addEventListener("click", incrementValue(incrementButton));
+  incrementButton.addEventListener("click", () => incrementValue(incrementButton, max, step));
   spinBox.append(incrementButton);
 
   element.appendChild(spinBox);
@@ -163,17 +176,20 @@ function createSpinBox(id, title, min, max, step, value) {
 
 function createCheckBox(id, title, checked) {
   const element = document.createElement("div");
+  element.class = "form-check";
 
   const label = document.createElement("label");
   label.for = id;
-  label.class = "form-label";
+  label.class = "form-check-label";
   label.innerText = title;
   element.appendChild(label);
 
   const checkBox = document.createElement("input");
+  checkBox.class = "form-check-input";
   checkBox.type = "checkbox";
   checkBox.id = id;
   checkBox.checked = checked
+  checkBox.name = id;
   element.appendChild(checkBox);
 
   return element;
@@ -193,6 +209,7 @@ function createTextBox(id, title, value, required) {
   textBox.type = "text";
   textBox.value = value;
   textBox.required = required;
+  textBox.name = id;
   element.appendChild(textBox);
 
   return element;
@@ -206,11 +223,12 @@ function createNumberInput(id, title, value, required) {
   label.class = "form-label";
   label.innerText = title;
   element.appendChild(label);
-  
+
   const num = document.createElement("input");
   num.type = "number";
   num.value = value;
   num.required = required;
+  num.name = id;
   element.appendChild(num);
 
   return element;
@@ -232,6 +250,7 @@ function createRangeBox(id, title, min, max, value, step) {
   rangeBox.step = step;
   rangeBox.id = id;
   rangeBox.value = value;
+  rangeBox.name = id;
   element.appendChild(rangeBox);
 
   return element;
@@ -248,6 +267,8 @@ function createSelectBox(id, title, options, defaultOption) {
 
   const selectBox = document.createElement("select"); // TODO: replace with bootstrap selectbox
   selectBox.class = "form-select";
+  selectBox.name = id;
+  selectBox.id = id;s
   for (let option in options) {
     const optionElement = document.createElement("option");
     optionElement.value = option.value;
@@ -261,22 +282,16 @@ function createSelectBox(id, title, options, defaultOption) {
 }
 
 
-function incrementValue(e) {
-  var parent = document.querySelectorAll(`[data-field=${e.dataset.field}]`);
-  var currentVal = parseInt(parent, 10);
-  if (!isNaN(currentVal)) {
-    parent.val(currentVal + 1);
-  } else {
-    parent.val(0);
-  }
+function incrementValue(e, max, step) {
+  const input = document.getElementById(e.dataset.field);
+  let currentVal = parseInt(input.value, 10) || 0;
+
+  if (currentVal < max) input.value = currentVal + step;
 }
 
-function decrementValue(e) {
-  var parent = document.querySelectorAll(`[data-field=${e.dataset.field}]`);
-  var currentVal = parseInt(parent, 10);
-  if (!isNaN(currentVal) && currentVal > 0) {
-    parent.val(currentVal - 1);
-  } else {
-    parent.val(0);
-  }
+function decrementValue(e, min, step) {
+  const input = document.getElementById(e.dataset.field);
+  let currentVal = parseInt(input.value, 10) || 0;
+
+  if (currentVal > min) input.value = currentVal - step;
 }
