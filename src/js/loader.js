@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', function() {
   submit.type = "submit";
   submit.className = "btn btn-primary d-block mt-2";
   submitDiv.appendChild(submit);
-  document.getElementsByClassName("formBody")[0].appendChild(render(config));
+  render(config)
   document.getElementsByClassName("formBody")[0].appendChild(submitDiv);
 });
 
@@ -82,43 +82,48 @@ const config = {
 
 function render(config) {
   // console.log(config["sections"][0]["fields"]);
-  var form = document.createElement("form");
+  var form = document.getElementsByClassName("formBody")[0]
 
   config.sections.forEach(section => {
     const sectionDiv = document.createElement("div");
-    sectionDiv.className = "container border-bottom";
+    sectionDiv.className = "row g-3 mb-3 pb-3 center";
 
     const sectionTitle = document.createElement("h4");
     sectionTitle.innerText = section.name;
+    sectionTitle.style.textAlign = "center";
     sectionDiv.appendChild(sectionTitle);
+    
+    const sectionFields = document.createElement("div");
+    sectionFields.className = "col-auto";
+    sectionDiv.appendChild(sectionFields);   
 
     section.fields.forEach(field => {
       console.log(field);
       switch (field.type) {
         case "text":
-          sectionDiv.appendChild(createTextBox(field["code"], field["title"], field["defaultValue"], field["required"]))
+          sectionFields.appendChild(createTextBox(field["code"], field["title"], field["defaultValue"], field["required"]))
           break
         case "number":
-          sectionDiv.appendChild(createNumberInput(field["code"], field["title"], field["defaultValue"]))
+          sectionFields.appendChild(createNumberInput(field["code"], field["title"], field["defaultValue"]))
           break
         case "checkbox":
-          sectionDiv.appendChild(createCheckBox(
+          sectionFields.appendChild(createCheckBox(
             field["code"], field["title"],
             (field["defaultValue"] == undefined) ? false : field["defaultValue"]
           ))
           break
         case "range":
-          sectionDiv.appendChild(createRangeBox(field["code"], field["title"],
+          sectionFields.appendChild(createRangeBox(field["code"], field["title"],
             (field["min"] == undefined) ? 0 : field["min"],
             (field["max"] == undefined) ? 10 : field["max"],
             (field["defaultValue"] == undefined) ? min : field["defaultValue"],
             (field["step"] == undefined) ? 1 : field["step"]))
           break
         case "select":
-          sectionDiv.appendChild(createSelectBox(field["code"], field["title"], field["choices"], field["defaultValue"]))
+          sectionFields.appendChild(createSelectBox(field["code"], field["title"], field["choices"], field["defaultValue"]))
           break
         case "spinbox":
-          sectionDiv.appendChild(createSpinBox(field["code"], field["title"],
+          sectionFields.appendChild(createSpinBox(field["code"], field["title"],
             field["min"] == undefined ? 0 : field["min"],
             field["max"] == undefined ? 10 : field["max"],
             field["step"] == undefined ? 1 : field["step"]))
@@ -135,15 +140,15 @@ function createSpinBox(id, title, min, max, step, value) {
 
   const label = document.createElement("label");
   label.for = id;
-  label.class = "form-label";
+  label.classList = "form-label";
   label.innerText = title;
   element.appendChild(label);
 
   let spinBox = document.createElement("div");
-  spinBox.class = "input-group mb-3 spinbox-group";
+  spinBox.classList = "input-group mb-3 spinbox-group";
 
   let decrementButton = document.createElement("button");
-  decrementButton.class = "btn btn-outline-secondary";
+  decrementButton.classList = "btn btn-primary";
   decrementButton.type = "button";
   decrementButton.innerText = "-";
   decrementButton.dataset.field = id;
@@ -162,7 +167,7 @@ function createSpinBox(id, title, min, max, step, value) {
   spinBox.append(num);
 
   let incrementButton = document.createElement("button");
-  incrementButton.class = "btn btn-outline-secondary";
+  incrementButton.classList = "btn btn-primary";
   incrementButton.type = "button";
   incrementButton.innerText = "+";
   incrementButton.dataset.field = id;
@@ -176,16 +181,16 @@ function createSpinBox(id, title, min, max, step, value) {
 
 function createCheckBox(id, title, checked) {
   const element = document.createElement("div");
-  element.class = "form-check";
+  element.classList = "form-check";
 
   const label = document.createElement("label");
   label.for = id;
-  label.class = "form-check-label";
+  label.classList = "form-check-label";
   label.innerText = title;
   element.appendChild(label);
 
   const checkBox = document.createElement("input");
-  checkBox.class = "form-check-input";
+  checkBox.classList = "form-check-input";
   checkBox.type = "checkbox";
   checkBox.id = id;
   checkBox.checked = checked
@@ -200,7 +205,7 @@ function createTextBox(id, title, value, required) {
 
   const label = document.createElement("label");
   label.for = id;
-  label.class = "form-label";
+  label.classList = "form-label";
   label.innerText = title;
   element.appendChild(label);
 
@@ -220,7 +225,7 @@ function createNumberInput(id, title, value, required) {
 
   const label = document.createElement("label");
   label.for = id;
-  label.class = "form-label";
+  label.classList = "form-label";
   label.innerText = title;
   element.appendChild(label);
 
@@ -240,7 +245,7 @@ function createRangeBox(id, title, min, max, value, step) {
   const label = document.createElement("label");
   label.for = id;
   label.innerText = title;
-  label.class = "form-label";
+  label.classList = "form-label";
   element.appendChild(label);
 
   const rangeBox = document.createElement("input"); // TODO: replace with bootstrap rangebox
@@ -262,11 +267,11 @@ function createSelectBox(id, title, options, defaultOption) {
   let label = document.createElement("label");
   label.for = id;
   label.innerText = title;
-  label.class = "form-label";
+  label.classList = "form-label";
   element.appendChild(label);
 
   const selectBox = document.createElement("select"); // TODO: replace with bootstrap selectbox
-  selectBox.class = "form-select";
+  selectBox.classList = "form-select";
   selectBox.name = id;
   selectBox.id = id;s
   for (let option in options) {
