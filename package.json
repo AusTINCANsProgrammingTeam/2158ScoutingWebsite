@@ -7,8 +7,8 @@
   "type": "commonjs",
   "main": "main.js",
   "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon . & npm run scss:watch",
+    "start": "node main.js",
+    "dev": "npm run scss:build & npm run start & npm run scss:watch",
     "scss:build": "sass src/scss/style.scss src/css/style.css",
     "scss:watch": "sass --watch src/scss:src/css"
   },

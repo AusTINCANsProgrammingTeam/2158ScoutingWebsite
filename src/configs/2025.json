@@ -266,9 +266,9 @@
             "type": "range",
             "required": false,
             "code": "or",
-            "defaultValue": 3,
+            "defaultValue": 4,
             "min": 1,
-            "max": 5,
+            "max": 7,
             "step": 1
           },
           {
@@ -276,9 +276,9 @@
             "type": "range",
             "required": false,
             "code": "dr",
-            "defaultValue": 3,
+            "defaultValue": 4,
             "min": 1,
-            "max": 5,
+            "max": 7,
             "step": 1
           },
           {

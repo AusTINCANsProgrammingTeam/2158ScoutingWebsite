@@ -1,11 +1,16 @@
 @import "../../node_modules/bootstrap/scss/functions";
 
 $primary: #FFF01F;
+$form-label-color: #CCBE00;
 $primary-bg-color: #010101;
 $secondary: #1F1F1F;
 
 @import "../../node_modules/bootstrap/scss/variables";
 @import "../../node_modules/bootstrap/scss/variables-dark";
+
+@import "../../node_modules/bootstrap/scss/maps";
+@import "../../node_modules/bootstrap/scss/mixins";
+@import "../../node_modules/bootstrap/scss/root";
 
 .center {
   display: flex;
@@ -24,6 +29,14 @@ $secondary: #1F1F1F;
 .clearfix {
   content: ".";
   clear: both;
+}
+
+.form-label {
+  color: $form-label-color;
+}
+
+.form-check-label {
+  color: $form-label-color;
 }
 
 .background {

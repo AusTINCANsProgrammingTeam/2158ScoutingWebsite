@@ -1,202 +1,34 @@
+var configFileName = "2025.json";
 
-document.addEventListener('DOMContentLoaded', function () {
+async function websiteBuilder() {
+  const response = await fetch('../configs/' + configFileName);
+  const data = await response.json();
+  render(await data);
+}
+
+document.addEventListener('DOMContentLoaded', async function () {
   let submitDiv = document.createElement("div");
   submitDiv.className = "row mt-3 mb-3";
   let submit = document.createElement("input");
   submit.type = "submit";
   submit.className = "btn btn-primary d-block mt-2 center content-style1";
   submitDiv.appendChild(submit);
-  render(config)
-  document.getElementsByClassName("formBody")[0].appendChild(submitDiv);
-});
-
-const config = {
-  sections: [
-    {
-        "name": "Prematch",
-        "fields": [
-          {
-            "title": "Scouter Initials",
-            "type": "text",
-            "required": true,
-            "code": "scouter",
-            "defaultValue": ""
-          },
-          {
-            "title": "Match Number",
-            "type": "number",
-            "required": true,
-            "code": "matchNumber",
-            "defaultValue": "0"
-          },
-          {
-            "title": "Robot",
-            "type": "select",
-            "required": true,
-            "code": "robot",
-            "choices": {
-              "R1": "Red 1",
-              "R2": "Red 2",
-              "R3": "Red 3",
-              "B1": "Blue 1",
-              "B2": "Blue 2",
-              "B3": "Blue 3"
-            },
-            "defaultValue": "R1"
-          },
-          {
-            "title": "Team Number",
-            "type": "number",
-            "required": true,
-            "code": "teamNumber",
-            "defaultValue": "0"
-          },
-          {
-            "title": "No Show",
-            "type": "checkbox",
-            "defaultValue": false,
-            "required": false,
-            "code": "noShow"
-          }
-        ]
-      },
-      {
-      "name": "Autonomous",
-      "fields": [
-        {
-          "code": "aucor1",
-          "title": "L1 Coral Scored",
-          "type": "spinbox",
-          "defaultValue": 0,
-          "min": 0,
-        },
-        {
-          "code": "aucor2",
-          "title": "L2 Coral Scored",
-          "type": "spinbox",
-          "defaultValue": 0,
-          "min": 0,
-        },
-        {
-          "code": "aucor3",
-          "title": "L3 Coral Scored",
-          "type": "spinbox",
-          "defaultValue": 0,
-          "min": 0,
-        },
-        {
-          "code": "aucor4",
-          "title": "L4 Coral Scored",
-          "type": "spinbox",
-          "defaultValue": 0,
-          "min": 0,
-        }, {
-          "code": "aumcor4",
-          "title": "L4 Coral Missed",
-          "type": "spinbox",
-          "defaultValue": 0,
-          "min": 0,
-        },
-        {
-          "code": "aualgp",
-          "title": "Algae Scored Processor",
-          "type": "spinbox",
-          "defaultValue": 0,
-          "min": 0,
-        },
-        {
-          "code": "aualgn",
-          "title": "Algae Scored Net",
-          "type": "spinbox",
-          "defaultValue": 0,
-          "min": 0,
-        },
-        {
-          "code": "auf",
-          "title": "Auto Foul",
-          "type": "checkbox",
-          "defaultValue": false,
-        },
-        {
-          "code": "aul",
-          "title": "Auto Leave",
-          "type": "checkbox",
-          "defaultValue": false,
-        }
-      ]
-    },
-    {
-      "name": "Teleop",
-      "fields": [
-        {
-          "code": "tcor1",
-          "title": "L1 Coral Scored",
-          "type": "spinbox",
-          "defaultValue": 0,
-          "min": 0,
-          "required": false
-        },
-        {
-          "code": "tcor2",
-          "title": "L2 Coral Scored",
-          "type": "spinbox",
-          "defaultValue": 0,
-          "min": 0,
-          "required": false
-        },
-        {
-          "code": "tcor3",
-          "title": "L3 Coral Scored",
-          "type": "spinbox",
-          "defaultValue": 0,
-          "min": 0,
-          "required": false
-        },
-        {
-          "code": "tcor4",
-          "title": "L4 Coral Scored",
-          "type": "spinbox",
-          "defaultValue": 0,
-          "min": 0,
-          "required": false
-        }, {
-          "code": "tmcor4",
-          "title": "L4 Coral Missed",
-          "type": "spinbox",
-          "defaultValue": 0,
-          "min": 0,
-          "required": false
-        },
-        {
-          "code": "talgp",
-          "title": "Algae Scored Processor",
-          "type": "spinbox",
-          "defaultValue": 0,
-          "min": 0,
-          "required": false
-        },
-        {
-          "code": "talgn",
-          "title": "Algae Scored Net",
-          "type": "spinbox",
-          "defaultValue": 0,
-          "min": 0,
-          "required": false
-        }
-      ]
+  websiteBuilder().finally(() => {
+      document.getElementsByClassName("formBody")[0].appendChild(submitDiv)
     }
-  ]
-}
+  );
+});
 
 function render(config) {
   // console.log(config["sections"][0]["fields"]);
   var form = document.getElementsByClassName("formBody")[0]
-
+  
   config.sections.forEach(section => {
     const sectionDiv = document.createElement("div");
     sectionDiv.className = "row center clearfix border-bottom content-style1";
 
     const sectionTitle = document.createElement("h4");
+    sectionTitle.className = "text-primary";
     sectionTitle.innerText = section.name;
     sectionTitle.style.textAlign = "center";
     sectionDiv.appendChild(sectionTitle);
@@ -206,7 +38,6 @@ function render(config) {
     sectionDiv.appendChild(sectionFields);
 
     section.fields.forEach(field => {
-      console.log(field);
       switch (field.type) {
         case "text":
           sectionFields.appendChild(createTextBox(field["code"], field["title"], field["defaultValue"], field["required"]))
@@ -248,12 +79,12 @@ function createSpinBox(id, title, min, max, step, value) {
 
   const label = document.createElement("label");
   label.for = id;
-  label.classList = "form-label";
+  label.classList = "form-label"
   label.innerText = title;
   element.appendChild(label);
 
   let spinBox = document.createElement("div");
-  spinBox.classList = "input-group mb-3 spinbox-group";
+  spinBox.classList = "input-group mb-3 spinbox-group flex-nowrap";
 
   let decrementButton = document.createElement("button");
   decrementButton.classList = "btn btn-primary";
@@ -313,7 +144,7 @@ function createTextBox(id, title, value, required) {
 
   const label = document.createElement("label");
   label.for = id;
-  label.classList = "form-label";
+  label.classList = "form-label p-2";
   label.innerText = title;
   element.appendChild(label);
 
@@ -333,7 +164,7 @@ function createNumberInput(id, title, value, required) {
 
   const label = document.createElement("label");
   label.for = id;
-  label.classList = "form-label";
+  label.classList = "form-label p-2";
   label.innerText = title;
   element.appendChild(label);
 
@@ -353,10 +184,11 @@ function createRangeBox(id, title, min, max, value, step) {
   const label = document.createElement("label");
   label.for = id;
   label.innerText = title;
-  label.classList = "form-label";
+  label.classList = "form-label p-2";
   element.appendChild(label);
 
   const rangeBox = document.createElement("input"); // TODO: replace with bootstrap rangebox
+  rangeBox.classList = "me-2";
   rangeBox.type = "range";
   rangeBox.min = min;
   rangeBox.max = max;
@@ -366,11 +198,19 @@ function createRangeBox(id, title, min, max, value, step) {
   rangeBox.name = id;
   element.appendChild(rangeBox);
 
+  const output = document.createElement("output")
+  output.for = id;
+  output.textContent = rangeBox.value;
+  element.appendChild(output);
+
+  rangeBox.addEventListener('input', function () {
+    output.textContent = this.value;
+  });
+
   return element;
 }
 
 function createSelectBox(id, title, options, defaultOption) {
-  console.log(options)
   let element = document.createElement("div");
   element.style.marginBottom = "15px";
 
@@ -384,10 +224,10 @@ function createSelectBox(id, title, options, defaultOption) {
   selectBox.classList = "form-select";
   selectBox.name = id;
   selectBox.id = id;
-  for (let option in options) {
+  for (option in options) {
     const optionElement = document.createElement("option");
-    optionElement.value = option.value;
-    optionElement.text = option.text;
+    optionElement.value = option;
+    optionElement.text = options[option];
     selectBox.appendChild(optionElement);
   }
   element.appendChild(selectBox);
@@ -408,4 +248,12 @@ function decrementValue(e, min, step) {
   let currentVal = parseInt(input.value, 10) || 0;
 
   if (currentVal > min) input.value = currentVal - step;
+}
+
+function submitFunction(e) {
+  e.preventDefault();
+
+  const formData = new FormData(e.target);
+  const data = Object.fromEntries(formData.entries());
+  console.log(data);
 }
