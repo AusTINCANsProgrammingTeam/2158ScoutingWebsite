@@ -45,7 +45,7 @@
           },
           {
             "title": "No Show",
-            "type": "boolean",
+            "type": "checkbox",
             "defaultValue": false,
             "required": false,
             "code": "noShow"
@@ -58,7 +58,7 @@
           {
             "code": "aucor1",
             "title": "L1 Coral Scored",
-            "type": "counter",
+            "type": "spinbox",
             "defaultValue": 0,
             "min": 0,
             "required": false
@@ -66,7 +66,7 @@
           {
             "code": "aucor2",
             "title": "L2 Coral Scored",
-            "type": "counter",
+            "type": "spinbox",
             "defaultValue": 0,
             "min": 0,
             "required": false
@@ -74,7 +74,7 @@
           {
             "code": "aucor3",
             "title": "L3 Coral Scored",
-            "type": "counter",
+            "type": "spinbox",
             "defaultValue": 0,
             "min": 0,
             "required": false
@@ -82,14 +82,14 @@
           {
             "code": "aucor4",
             "title": "L4 Coral Scored",
-            "type": "counter",
+            "type": "spinbox",
             "defaultValue": 0,
             "min": 0,
             "required": false
           },{
             "code": "aumcor4",
             "title": "L4 Coral Missed",
-            "type": "counter",
+            "type": "spinbox",
             "defaultValue": 0,
             "min": 0,
             "required": false
@@ -97,7 +97,7 @@
           {
             "code": "aualgp",
             "title": "Algae Scored Processor",
-            "type": "counter",
+            "type": "spinbox",
             "defaultValue": 0,
             "min": 0,
             "required": false
@@ -105,7 +105,7 @@
           {
             "code": "aualgn",
             "title": "Algae Scored Net",
-            "type": "counter",
+            "type": "spinbox",
             "defaultValue": 0,
             "min": 0,
             "required": false
@@ -113,14 +113,14 @@
           {
             "code": "auf",
             "title": "Auto Foul",
-            "type": "boolean",
+            "type": "checkbox",
             "defaultValue": false,
             "required": false
           },
           {
             "code": "aul",
             "title": "Auto Leave",
-            "type": "boolean",
+            "type": "checkbox",
             "defaultValue": false,
             "required": false
           }
@@ -132,7 +132,7 @@
             {
                 "code": "tcor1",
                 "title": "L1 Coral Scored",
-                "type": "counter",
+                "type": "spinbox",
                 "defaultValue": 0,
                 "min": 0,
                 "required": false
@@ -140,7 +140,7 @@
               {
                 "code": "tcor2",
                 "title": "L2 Coral Scored",
-                "type": "counter",
+                "type": "spinbox",
                 "defaultValue": 0,
                 "min": 0,
                 "required": false
@@ -148,7 +148,7 @@
               {
                 "code": "tcor3",
                 "title": "L3 Coral Scored",
-                "type": "counter",
+                "type": "spinbox",
                 "defaultValue": 0,
                 "min": 0,
                 "required": false
@@ -156,14 +156,14 @@
               {
                 "code": "tcor4",
                 "title": "L4 Coral Scored",
-                "type": "counter",
+                "type": "spinbox",
                 "defaultValue": 0,
                 "min": 0,
                 "required": false
               },{
                 "code": "tmcor4",
                 "title": "L4 Coral Missed",
-                "type": "counter",
+                "type": "spinbox",
                 "defaultValue": 0,
                 "min": 0,
                 "required": false
@@ -171,7 +171,7 @@
               {
                 "code": "talgp",
                 "title": "Algae Scored Processor",
-                "type": "counter",
+                "type": "spinbox",
                 "defaultValue": 0,
                 "min": 0,
                 "required": false
@@ -179,7 +179,7 @@
               {
                 "code": "talgn",
                 "title": "Algae Scored Net",
-                "type": "counter",
+                "type": "spinbox",
                 "defaultValue": 0,
                 "min": 0,
                 "required": false
@@ -236,28 +236,28 @@
           {
             "code": "Fou/Tech",
             "title": "Foul",
-            "type": "counter",
+            "type": "spinbox",
             "defaultValue": 0,
             "required": false
           },
           {
             "code": "d",
             "title": "Died",
-            "type": "boolean",
+            "type": "checkbox",
             "defaultValue": false,
             "required": false
           },
           {
             "code": "to",
             "title": "Tipped Over",
-            "type": "boolean",
+            "type": "checkbox",
             "defaultValue": false,
             "required": false
           },
           {
             "code": "yc",
             "title": "Yellow/Red Card",
-            "type": "boolean",
+            "type": "checkbox",
             "defaultValue": false,
             "required": false
           },
