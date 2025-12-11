@@ -2,5 +2,15 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 200px;
+  margin: auto;
+}
+.content-style1{
+  width: 60%;
+  left: 50%;
+  padding-bottom: 15px;
+  margin-bottom: 15px;
+}
+.clearfix {
+    content: ".";
+    clear: both;
 }

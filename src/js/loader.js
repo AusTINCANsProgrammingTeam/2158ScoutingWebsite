@@ -1,10 +1,10 @@
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
   let submitDiv = document.createElement("div");
-  submitDiv.className = "container mt-3 mb-3";
+  submitDiv.className = "row mt-3 mb-3";
   let submit = document.createElement("input");
   submit.type = "submit";
-  submit.className = "btn btn-primary d-block mt-2";
+  submit.className = "btn btn-primary d-block mt-2 center content-style1";
   submitDiv.appendChild(submit);
   render(config)
   document.getElementsByClassName("formBody")[0].appendChild(submitDiv);
@@ -76,6 +76,66 @@ const config = {
           "defaultValue": false,
         }
       ]
+    },
+    {
+      "name": "Teleop",
+      "fields": [
+        {
+          "code": "tcor1",
+          "title": "L1 Coral Scored",
+          "type": "spinbox",
+          "defaultValue": 0,
+          "min": 0,
+          "required": false
+        },
+        {
+          "code": "tcor2",
+          "title": "L2 Coral Scored",
+          "type": "spinbox",
+          "defaultValue": 0,
+          "min": 0,
+          "required": false
+        },
+        {
+          "code": "tcor3",
+          "title": "L3 Coral Scored",
+          "type": "spinbox",
+          "defaultValue": 0,
+          "min": 0,
+          "required": false
+        },
+        {
+          "code": "tcor4",
+          "title": "L4 Coral Scored",
+          "type": "spinbox",
+          "defaultValue": 0,
+          "min": 0,
+          "required": false
+        }, {
+          "code": "tmcor4",
+          "title": "L4 Coral Missed",
+          "type": "spinbox",
+          "defaultValue": 0,
+          "min": 0,
+          "required": false
+        },
+        {
+          "code": "talgp",
+          "title": "Algae Scored Processor",
+          "type": "spinbox",
+          "defaultValue": 0,
+          "min": 0,
+          "required": false
+        },
+        {
+          "code": "talgn",
+          "title": "Algae Scored Net",
+          "type": "spinbox",
+          "defaultValue": 0,
+          "min": 0,
+          "required": false
+        }
+      ]
     }
   ]
 }
@@ -86,16 +146,16 @@ function render(config) {
 
   config.sections.forEach(section => {
     const sectionDiv = document.createElement("div");
-    sectionDiv.className = "row g-3 mb-3 pb-3 center";
+    sectionDiv.className = "row center clearfix border-bottom content-style1";
 
     const sectionTitle = document.createElement("h4");
     sectionTitle.innerText = section.name;
     sectionTitle.style.textAlign = "center";
     sectionDiv.appendChild(sectionTitle);
-    
+
     const sectionFields = document.createElement("div");
     sectionFields.className = "col-auto";
-    sectionDiv.appendChild(sectionFields);   
+    sectionDiv.appendChild(sectionFields);
 
     section.fields.forEach(field => {
       console.log(field);
@@ -273,7 +333,7 @@ function createSelectBox(id, title, options, defaultOption) {
   const selectBox = document.createElement("select"); // TODO: replace with bootstrap selectbox
   selectBox.classList = "form-select";
   selectBox.name = id;
-  selectBox.id = id;s
+  selectBox.id = id; s
   for (let option in options) {
     const optionElement = document.createElement("option");
     optionElement.value = option.value;
