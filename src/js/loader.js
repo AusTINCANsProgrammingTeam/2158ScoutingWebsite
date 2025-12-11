@@ -13,6 +13,54 @@ document.addEventListener('DOMContentLoaded', function () {
 const config = {
   sections: [
     {
+        "name": "Prematch",
+        "fields": [
+          {
+            "title": "Scouter Initials",
+            "type": "text",
+            "required": true,
+            "code": "scouter",
+            "defaultValue": ""
+          },
+          {
+            "title": "Match Number",
+            "type": "number",
+            "required": true,
+            "code": "matchNumber",
+            "defaultValue": "0"
+          },
+          {
+            "title": "Robot",
+            "type": "select",
+            "required": true,
+            "code": "robot",
+            "choices": {
+              "R1": "Red 1",
+              "R2": "Red 2",
+              "R3": "Red 3",
+              "B1": "Blue 1",
+              "B2": "Blue 2",
+              "B3": "Blue 3"
+            },
+            "defaultValue": "R1"
+          },
+          {
+            "title": "Team Number",
+            "type": "number",
+            "required": true,
+            "code": "teamNumber",
+            "defaultValue": "0"
+          },
+          {
+            "title": "No Show",
+            "type": "checkbox",
+            "defaultValue": false,
+            "required": false,
+            "code": "noShow"
+          }
+        ]
+      },
+      {
       "name": "Autonomous",
       "fields": [
         {
@@ -322,7 +370,9 @@ function createRangeBox(id, title, min, max, value, step) {
 }
 
 function createSelectBox(id, title, options, defaultOption) {
+  console.log(options)
   let element = document.createElement("div");
+  element.style.marginBottom = "15px";
 
   let label = document.createElement("label");
   label.for = id;
@@ -333,14 +383,13 @@ function createSelectBox(id, title, options, defaultOption) {
   const selectBox = document.createElement("select"); // TODO: replace with bootstrap selectbox
   selectBox.classList = "form-select";
   selectBox.name = id;
-  selectBox.id = id; s
+  selectBox.id = id;
   for (let option in options) {
     const optionElement = document.createElement("option");
     optionElement.value = option.value;
     optionElement.text = option.text;
     selectBox.appendChild(optionElement);
   }
-  selectBox.datasest.options = options;
   element.appendChild(selectBox);
 
   return element;

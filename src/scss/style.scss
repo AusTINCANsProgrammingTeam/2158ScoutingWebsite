@@ -1,0 +1,31 @@
+@import "../../node_modules/bootstrap/scss/functions";
+
+$primary: #FFF01F;
+$primary-bg-color: #010101;
+$secondary: #1F1F1F;
+
+@import "../../node_modules/bootstrap/scss/variables";
+@import "../../node_modules/bootstrap/scss/variables-dark";
+
+.center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: auto;
+}
+
+.content-style1 {
+  width: 60%;
+  left: 50%;
+  padding-bottom: 15px;
+  margin-bottom: 10px;
+}
+
+.clearfix {
+  content: ".";
+  clear: both;
+}
+
+.background {
+  background-color: $primary-bg-color;
+}

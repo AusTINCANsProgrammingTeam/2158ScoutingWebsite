@@ -4,13 +4,21 @@
   align-items: center;
   margin: auto;
 }
-.content-style1{
+
+.content-style1 {
   width: 60%;
   left: 50%;
   padding-bottom: 15px;
-  margin-bottom: 15px;
+  margin-bottom: 10px;
 }
+
 .clearfix {
-    content: ".";
-    clear: both;
+  content: ".";
+  clear: both;
 }
+
+.background {
+  background-color: #010101;
+}
+
+/*# sourceMappingURL=style.css.map */

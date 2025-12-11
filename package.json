@@ -5,13 +5,17 @@
   "license": "ISC",
   "author": "Kennyson Le",
   "type": "commonjs",
-  "main": ",",
+  "main": "main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index.js",
+    "dev": "nodemon . & npm run scss:watch",
+    "scss:build": "sass src/scss/style.scss src/css/style.css",
+    "scss:watch": "sass --watch src/scss:src/css"
   },
   "dependencies": {
     "bootstrap": "^5.3.8",
     "express": "^5.2.1",
-    "nodemon": "^3.1.11"
+    "nodemon": "^3.1.11",
+    "sass": "^1.96.0"
   }
 }
