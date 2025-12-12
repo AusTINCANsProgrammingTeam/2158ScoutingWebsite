@@ -20,6 +20,9 @@ const prematchConfig = {
   ]
 };
 
+// Form Variables
+var startingPosition = (0,0)
+
 /*
  *  Init 
  */
@@ -157,20 +160,19 @@ function createClickImage({ code, title, imgRed, imgBlue, defaultValue, required
 
 
   let currentImage = new Image();
-  currentImage.src = imgBlue;
+  currentImage.src = imgRed;
   currentImage.onload = () => drawImage();
-  let marker = null;
   setTimeout(() => {
     var selectedRobot = document.getElementById("robot")
     selectedRobot.addEventListener("change", function () {
-      if (this.value.charAt(0) == 'R') {
-        currentImage.src = imgRed
+      if (this.value.charAt(0) == 'B') {
+        currentImage.src =imgBlue
       } else {
-        currentImage.src = imgBlue
+        currentImage.src = imgRed
       }
       console.log(currentImage.src)
       currentImage.onload = () => {
-        marker = null;
+        startingPosition = null;
         drawImage();
       };
     })
@@ -182,10 +184,10 @@ function createClickImage({ code, title, imgRed, imgBlue, defaultValue, required
     const x = Math.round(event.clientX - rect.left);
     const y = Math.round(event.clientY - rect.top);
 
-    marker = { x, y };
+    startingPosition = { x, y };
 
     drawImage();
-    drawMarker(marker.x, marker.y);
+    drawMarker(startingPosition.x, startingPosition.y);
 
     console.log(`Clicked at: (${x}, ${y})`);
   });
@@ -256,15 +258,15 @@ function createSelectBox({ code, title, choices, defaultValue }) {
 */
 function submitFunction(e) {
   e.preventDefault();
-  const formData = Object.fromEntries(new FormData(e.target).entries());
-
+  const data = new FormData(e.target).entries()
+  const formData = Object.fromEntries(data)
+  formData.startingPos = `${startingPosition.x}, ${startingPosition.y}`
+ 
   fetch('/submit-form', {
     method: 'POST',
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(formData)
   });
-
-  console.log(formData);
 }
 
 function resetFunction(e) {

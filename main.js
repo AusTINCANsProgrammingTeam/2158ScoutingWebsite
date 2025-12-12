@@ -39,7 +39,7 @@ app.listen(port, () => {
 app.post('/submit-form', (req, res) => {
   const formData = req.body;
   console.log('Form Data Received:', formData);
-  res.send(`Registration successful for ${formData.name}!`);
+//   res.send(`Registration successful for ${formData.name}!`);
   
   sheet.addRow(formData);
 })

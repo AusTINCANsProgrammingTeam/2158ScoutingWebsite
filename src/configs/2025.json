@@ -7,7 +7,7 @@
         "name": "Autonomous",
         "fields": [
           {
-            "code": "aucor1",
+            "code": "AutoCorL1",
             "title": "L1 Coral Scored",
             "type": "spinbox",
             "defaultValue": 0,
@@ -15,7 +15,7 @@
             "required": false
           },
           {
-            "code": "aucor2",
+            "code": "AutoCorL2",
             "title": "L2 Coral Scored",
             "type": "spinbox",
             "defaultValue": 0,
@@ -23,7 +23,7 @@
             "required": false
           },
           {
-            "code": "aucor3",
+            "code": "AutoCorL3",
             "title": "L3 Coral Scored",
             "type": "spinbox",
             "defaultValue": 0,
@@ -31,14 +31,14 @@
             "required": false
           },
           {
-            "code": "aucor4",
+            "code": "AutoCorL4",
             "title": "L4 Coral Scored",
             "type": "spinbox",
             "defaultValue": 0,
             "min": 0,
             "required": false
           },{
-            "code": "aumcor4",
+            "code": "AutoCorMissL4",
             "title": "L4 Coral Missed",
             "type": "spinbox",
             "defaultValue": 0,
@@ -46,7 +46,7 @@
             "required": false
           },
           {
-            "code": "aualgp",
+            "code": "AutoAlgProcess",
             "title": "Algae Scored Processor",
             "type": "spinbox",
             "defaultValue": 0,
@@ -54,7 +54,7 @@
             "required": false
           },
           {
-            "code": "aualgn",
+            "code": "AutoAlgNet",
             "title": "Algae Scored Net",
             "type": "spinbox",
             "defaultValue": 0,
@@ -62,14 +62,14 @@
             "required": false
           },
           {
-            "code": "auf",
+            "code": "AutoFoul",
             "title": "Auto Foul",
             "type": "checkbox",
             "defaultValue": false,
             "required": false
           },
           {
-            "code": "aul",
+            "code": "AutoLeave",
             "title": "Auto Leave",
             "type": "checkbox",
             "defaultValue": false,
@@ -81,7 +81,7 @@
         "name": "Teleop",
         "fields": [
             {
-                "code": "tcor1",
+                "code": "TeleCorL1",
                 "title": "L1 Coral Scored",
                 "type": "spinbox",
                 "defaultValue": 0,
@@ -89,7 +89,7 @@
                 "required": false
               },
               {
-                "code": "tcor2",
+                "code": "TeleCorL2",
                 "title": "L2 Coral Scored",
                 "type": "spinbox",
                 "defaultValue": 0,
@@ -97,7 +97,7 @@
                 "required": false
               },
               {
-                "code": "tcor3",
+                "code": "TeleCorL3",
                 "title": "L3 Coral Scored",
                 "type": "spinbox",
                 "defaultValue": 0,
@@ -105,14 +105,14 @@
                 "required": false
               },
               {
-                "code": "tcor4",
+                "code": "TeleCorL4",
                 "title": "L4 Coral Scored",
                 "type": "spinbox",
                 "defaultValue": 0,
                 "min": 0,
                 "required": false
               },{
-                "code": "tmcor4",
+                "code": "TeleCorMissL4",
                 "title": "L4 Coral Missed",
                 "type": "spinbox",
                 "defaultValue": 0,
@@ -120,7 +120,7 @@
                 "required": false
               },
               {
-                "code": "talgp",
+                "code": "TeleAlgProcess",
                 "title": "Algae Scored Processor",
                 "type": "spinbox",
                 "defaultValue": 0,
@@ -128,7 +128,7 @@
                 "required": false
               },
               {
-                "code": "talgn",
+                "code": "TeleAlgNet",
                 "title": "Algae Scored Net",
                 "type": "spinbox",
                 "defaultValue": 0,
@@ -144,7 +144,7 @@
             "title": "End Position",
             "type": "select",
             "required": true,
-            "code": "epo",
+            "code": "endgamePos",
             "choices": {
               "No": "No Climb",
               "Pr": "Parked",
@@ -157,7 +157,7 @@
             "title": "Coral Pickup Location",
             "type": "select",
             "required": true,
-            "code": "Npl",
+            "code": "CoralPickLoc",
             "choices": {
               "N": "None",
               "G": "Ground",
@@ -170,7 +170,7 @@
             "title": "Algae Pickup Location",
             "type": "select",
             "required": true,
-            "code": "Np2",
+            "code": "AlgaePickLoc",
             "choices": {
               "X": "None",
               "G": "Ground",
@@ -185,28 +185,28 @@
         "name": "Postmatch",
         "fields": [
           {
-            "code": "Fou/Tech",
+            "code": "Fouls",
             "title": "Foul",
             "type": "spinbox",
             "defaultValue": 0,
             "required": false
           },
           {
-            "code": "d",
+            "code": "Died",
             "title": "Died",
             "type": "checkbox",
             "defaultValue": false,
             "required": false
           },
           {
-            "code": "to",
+            "code": "Tipped",
             "title": "Tipped Over",
             "type": "checkbox",
             "defaultValue": false,
             "required": false
           },
           {
-            "code": "yc",
+            "code": "YRCard",
             "title": "Yellow/Red Card",
             "type": "checkbox",
             "defaultValue": false,
@@ -216,7 +216,7 @@
             "title": "Offense Skill",
             "type": "range",
             "required": false,
-            "code": "or",
+            "code": "offskillrate",
             "defaultValue": 4,
             "min": 1,
             "max": 7,
@@ -226,14 +226,14 @@
             "title": "Defense Skill",
             "type": "range",
             "required": false,
-            "code": "dr",
+            "code": "defskillrate",
             "defaultValue": 4,
             "min": 1,
             "max": 7,
             "step": 1
           },
           {
-            "code": "co",
+            "code": "comments",
             "title": "Comments",
             "type": "text",
             "min": 0,
