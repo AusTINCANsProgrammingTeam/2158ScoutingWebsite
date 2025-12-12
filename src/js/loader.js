@@ -16,7 +16,7 @@ const prematchConfig = {
     },
     { title: "Team Number", type: "number", required: true, code: "teamNumber", defaultValue: "0" },
     { title: "No Show", type: "checkbox", code: "noShow", defaultValue: false },
-    { title: "Starting Position", type: "clickImg", required: true, imgSrc: "../img/field_2025_red.png", code: "startingPosition", defaultValue: "" }
+    { title: "Starting Position", type: "clickImg", required: true, imgRed: "../img/field_2025_red.png", imgBlue: "../img/field_2025_blue.png", code: "startingPosition", defaultValue: "" }
   ]
 };
 
@@ -140,7 +140,7 @@ function createSpinBox({ code, title, min = 0, max = 10, step = 1, defaultValue 
   return el;
 }
 
-function createClickImage({ code, title, imgSrc, defaultValue, required }) {
+function createClickImage({ code, title, imgRed, imgBlue, defaultValue, required }) {
   const el = wrapper();
   el.appendChild(labelFor(code, title));
 
@@ -153,33 +153,59 @@ function createClickImage({ code, title, imgSrc, defaultValue, required }) {
   const ctx = canvas.getContext("2d");
 
   const img = new Image();
-  img.src = imgSrc;
+  img.src = imgRed;
 
-  img.onload = function () {
-    canvas.width = img.naturalWidth;
-    canvas.height = img.naturalHeight;
-    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-  };
+
+  let currentImage = new Image();
+  currentImage.src = imgBlue;
+  currentImage.onload = () => drawImage();
+  let marker = null;
+  setTimeout(() => {
+    var selectedRobot = document.getElementById("robot")
+    selectedRobot.addEventListener("change", function () {
+      if (this.value.charAt(0) == 'R') {
+        currentImage.src = imgRed
+      } else {
+        currentImage.src = imgBlue
+      }
+      console.log(currentImage.src)
+      currentImage.onload = () => {
+        marker = null;
+        drawImage();
+      };
+    })
+  }, 1000)
 
   canvas.addEventListener("click", function (event) {
-  const rect = canvas.getBoundingClientRect();
+    const rect = canvas.getBoundingClientRect();
 
-  const x = Math.round(event.clientX - rect.left);
-  const y = Math.round(event.clientY - rect.top);
+    const x = Math.round(event.clientX - rect.left);
+    const y = Math.round(event.clientY - rect.top);
 
-  ctx.drawImage(img, 0, 0);
+    marker = { x, y };
 
-  drawMarker(x, y);
-  console.log(`Clicked at: (${x}, ${y})`);
-});
+    drawImage();
+    drawMarker(marker.x, marker.y);
 
-function drawMarker(x, y) {
-  let radius = 32
-  ctx.fillStyle = "red";
-  ctx.beginPath();
-  ctx.rect(x-radius/2, y-radius/2, radius, radius);
-  ctx.fill();
-}
+    console.log(`Clicked at: (${x}, ${y})`);
+  });
+
+  function drawImage() {
+    // Resize canvas to match the image
+    canvas.width = currentImage.naturalWidth;
+    canvas.height = currentImage.naturalHeight;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(currentImage, 0, 0);
+  }
+
+  function drawMarker(x, y) {
+    radius = 32
+    ctx.fillStyle = "red";
+    ctx.beginPath();
+    ctx.rect(x-radius/2, y-radius/2, radius, radius);
+    ctx.fill();
+  }
   return el;
 }
 
