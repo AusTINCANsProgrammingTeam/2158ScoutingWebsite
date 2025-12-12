@@ -1,430 +1,297 @@
 var configFileName = "2025.json";
-var form = document.getElementsByClassName("formBody")[0]
+var form = document.getElementsByClassName("formBody")[0];
 
-
+// Prematch
 const prematchConfig = {
-  "name": "Prematch",
-  "preserveDataOnReset": true,
-  "fields": [
+  name: "Prematch",
+  preserveDataOnReset: true,
+  fields: [
+    { title: "Scouter Name", type: "text", required: true, code: "scouter", defaultValue: "" },
+    { title: "Match Number", type: "number", required: true, code: "matchNumber", defaultValue: "0" },
     {
-      "title": "Scouter Name",
-      "type": "text",
-      "required": true,
-      "code": "scouter",
-      "defaultValue": ""
+      title: "Robot", type: "select", required: true,
+      code: "robot",
+      choices: { R1: "Red 1", R2: "Red 2", R3: "Red 3", B1: "Blue 1", B2: "Blue 2", B3: "Blue 3" },
+      defaultValue: "R1"
     },
-    {
-      "title": "Match Number",
-      "type": "number",
-      "required": true,
-      "code": "matchNumber",
-      "defaultValue": "0"
-    },
-    {
-      "title": "Robot",
-      "type": "select",
-      "required": true,
-      "code": "robot",
-      "choices": {
-        "R1": "Red 1",
-        "R2": "Red 2",
-        "R3": "Red 3",
-        "B1": "Blue 1",
-        "B2": "Blue 2",
-        "B3": "Blue 3"
-      },
-      "defaultValue": "R1"
-    },
-    {
-      "title": "Team Number",
-      "type": "number",
-      "required": true,
-      "code": "teamNumber",
-      "defaultValue": "0"
-    },
-    {
-      "title": "No Show",
-      "type": "checkbox",
-      "defaultValue": false,
-      "required": false,
-      "code": "noShow"
-    }
+    { title: "Team Number", type: "number", required: true, code: "teamNumber", defaultValue: "0" },
+    { title: "No Show", type: "checkbox", code: "noShow", defaultValue: false }
   ]
-}
+};
 
+/*
+ *  Init 
+ */
 async function websiteBuilder() {
-  const response = await fetch('../configs/' + configFileName); 
+  const response = await fetch('../configs/' + configFileName);
   const data = await response.json();
-  renderPrematch(prematchConfig);
-  render(await data);
+
+  renderSection("Prematch", prematchConfig.fields);
+  renderConfigSections(data.sections);
 }
 
-document.addEventListener('DOMContentLoaded', async function () {
-  let submitDiv = document.createElement("div");
-  submitDiv.className = "row mt-3 mb-3";
-  let submit = document.createElement("input");
-  submit.type = "submit";
-  submit.className = "btn btn-primary d-block mt-2 center content-style1";
-  submitDiv.appendChild(submit);
-
-  let resetDiv = document.createElement("div");
-  let reset = document.createElement("input");
-  reset.type = "reset";
-  reset.className = "btn btn-secondary d-block mt-2 center content-style1";
-  reset.onclick = resetFunction;
-  resetDiv.appendChild(reset);
-
-  let getKeys = document.createElement("input");;
-  getKeys.type = "button";
-  getKeys.value = "Get Form Keys";
-  getKeys.className = "btn btn-secondary d-block mt-2 center content-style1";
-  getKeys.onclick = function() {
-    let formData = new FormData(form);
-    let data = Object.fromEntries(formData.entries());
-    console.log("" + Object.keys(data).join(", "));
-  }
-  websiteBuilder().finally(() => {
-    document.getElementsByClassName("formBody")[0].appendChild(submitDiv)
-    document.getElementsByClassName("formBody")[0].appendChild(resetDiv)
-    document.getElementsByClassName("formBody")[0].appendChild(getKeys)
-  }
-  );
+document.addEventListener('DOMContentLoaded', async () => {
+  await websiteBuilder();
+  addFormButtons();
 });
 
-function renderPrematch(config) { // TODO: Add extra logic
-  // console.log(config["sections"][0]["fields"]);
-  const sectionDiv = document.createElement("div");
-  sectionDiv.className = "row center clearfix border-bottom content-style1";
-
-  const sectionTitle = document.createElement("h4");
-  sectionTitle.className = "text-primary";
-  sectionTitle.innerText = "Prematch";
-  sectionTitle.style.textAlign = "center";
-  sectionDiv.appendChild(sectionTitle);
-
-  const sectionFields = document.createElement("div");
-  sectionFields.className = "col-auto";
-  sectionDiv.appendChild(sectionFields);
-  config.fields.forEach(field => {
-      switch (field.type) {
-        case "text":
-          sectionFields.appendChild(createTextBox(field["code"], field["title"], field["defaultValue"], field["required"]))
-          break
-        case "number":
-          sectionFields.appendChild(createNumberInput(field["code"], field["title"], field["defaultValue"],
-            field["required"] == undefined ? false : field["required"]))
-          break
-        case "checkbox":
-          sectionFields.appendChild(createCheckBox(
-            field["code"], field["title"],
-            (field["defaultValue"] == undefined) ? false : field["defaultValue"]
-          ))
-          break
-        case "range":
-          sectionFields.appendChild(createRangeBox(field["code"], field["title"],
-            (field["min"] == undefined) ? 0 : field["min"],
-            (field["max"] == undefined) ? 10 : field["max"],
-            (field["defaultValue"] == undefined) ? min : field["defaultValue"],
-            (field["step"] == undefined) ? 1 : field["step"],
-            (field["required"] == undefined) ? false : field["required"]))
-          break
-        case "select":
-          sectionFields.appendChild(createSelectBox(field["code"], field["title"], field["choices"], field["defaultValue"],
-            field["required"] == undefined ? false : field["required"]
-          ))
-          break
-        case "spinbox":
-          sectionFields.appendChild(createSpinBox(field["code"], field["title"],
-            field["min"] == undefined ? 0 : field["min"],
-            field["max"] == undefined ? 10 : field["max"],
-            field["step"] == undefined ? 1 : field["step"],
-            field["required"] == undefined ? false : field["required"]))
-          break
-      }
-    })
-  form.appendChild(sectionDiv);
-  return form;
-}
-
-function render(config) {
-  // console.log(config["sections"][0]["fields"]);
+/*
+* Render Functions
+*/
+function renderConfigSections(sections) {
   form.onsubmit = submitFunction;
-
-  config.sections.forEach(section => {
-    const sectionDiv = document.createElement("div");
-    sectionDiv.className = "row center clearfix border-bottom content-style1";
-
-    const sectionTitle = document.createElement("h4");
-    sectionTitle.className = "text-primary";
-    sectionTitle.innerText = section.name;
-    sectionTitle.style.textAlign = "center";
-    sectionDiv.appendChild(sectionTitle);
-
-    const sectionFields = document.createElement("div");
-    sectionFields.className = "col-auto";
-    sectionDiv.appendChild(sectionFields);
-
-    section.fields.forEach(field => {
-      switch (field.type) {
-        case "text":
-          sectionFields.appendChild(createTextBox(field["code"], field["title"], field["defaultValue"], field["required"]))
-          break
-        case "number":
-          sectionFields.appendChild(createNumberInput(field["code"], field["title"], field["defaultValue"],
-            field["required"] == undefined ? false : field["required"]))
-          break
-        case "checkbox":
-          sectionFields.appendChild(createCheckBox(
-            field["code"], field["title"],
-            (field["defaultValue"] == undefined) ? false : field["defaultValue"]
-          ))
-          break
-        case "range":
-          sectionFields.appendChild(createRangeBox(field["code"], field["title"],
-            (field["min"] == undefined) ? 0 : field["min"],
-            (field["max"] == undefined) ? 10 : field["max"],
-            (field["defaultValue"] == undefined) ? min : field["defaultValue"],
-            (field["step"] == undefined) ? 1 : field["step"],
-            (field["required"] == undefined) ? false : field["required"]))
-          break
-        case "select":
-          sectionFields.appendChild(createSelectBox(field["code"], field["title"], field["choices"], field["defaultValue"],
-            field["required"] == undefined ? false : field["required"]
-          ))
-          break
-        case "spinbox":
-          sectionFields.appendChild(createSpinBox(field["code"], field["title"],
-            field["min"] == undefined ? 0 : field["min"],
-            field["max"] == undefined ? 10 : field["max"],
-            field["step"] == undefined ? 1 : field["step"],
-            field["defaultValue"] == undefined ? 0 : field["defaultValue"],
-            field["required"] == undefined ? false : field["required"]))
-          break
-      }
-    })
-    form.appendChild(sectionDiv);
-  })
-  return form;
+  sections.forEach(section => renderSection(section.name, section.fields));
 }
 
-function createSpinBox(id, title, min, max, step, value, required) {
-  let element = document.createElement("div");
+function renderSection(name, fields) {
+  const sectionDiv = createElement("div", "row center clearfix border-bottom content-style1");
 
-  const label = document.createElement("label");
-  label.for = id;
-  label.classList = "form-label"
-  label.innerText = title;
-  element.appendChild(label);
+  const title = createElement("h4", "text-primary");
+  title.innerText = name;
+  title.style.textAlign = "center";
+  sectionDiv.appendChild(title);
 
-  let spinBox = document.createElement("div");
-  spinBox.classList = "input-group mb-3 spinbox-group flex-nowrap";
+  const fieldContainer = createElement("div", "col-auto");
+  sectionDiv.appendChild(fieldContainer);
 
-  let decrementButton = document.createElement("button");
-  decrementButton.classList = "btn btn-primary";
-  decrementButton.type = "button";
-  decrementButton.innerText = "-";
-  decrementButton.dataset.field = id;
-  decrementButton.addEventListener("click", () => decrementValue(decrementButton, min, step));
-  spinBox.append(decrementButton);
-
-  const num = document.createElement("input"); // TODO: replace with bootstrap spinbox
-  num.dataset.type = "number";
-  num.dataset.default = value;
-  num.min = min;
-  num.max = max;
-  num.step = step;
-  num.value = value;
-  num.id = id;
-  num.name = id;
-  num.required = required;
-  num.classList = "spinbox reset";
-  spinBox.append(num);
-
-  let incrementButton = document.createElement("button");
-  incrementButton.classList = "btn btn-primary";
-  incrementButton.type = "button";
-  incrementButton.innerText = "+";
-  incrementButton.dataset.field = id;
-  incrementButton.addEventListener("click", () => incrementValue(incrementButton, max, step));
-  spinBox.append(incrementButton);
-
-  element.appendChild(spinBox);
-
-  return element;
-}
-
-function createCheckBox(id, title, checked, required) {
-  const element = document.createElement("div");
-  element.classList = "form-check";
-
-  const label = document.createElement("label");
-  label.for = id;
-  label.classList = "form-check-label";
-  label.innerText = title;
-  element.appendChild(label);
-
-  const checkBox = document.createElement("input");
-  checkBox.classList = "form-check-input reset";
-  checkBox.type = "checkbox";
-  checkBox.id = id;
-  checkBox.checked = checked;
-  checkBox.dataset.default = checked;
-  checkBox.name = id;
-  checkBox.required = required;
-  element.appendChild(checkBox);
-
-  return element;
-}
-
-function createTextBox(id, title, value, required) {
-  const element = document.createElement("div");
-
-  const label = document.createElement("label");
-  label.for = id;
-  label.classList = "form-label p-2";
-  label.innerText = title;
-  element.appendChild(label);
-
-  const textBox = document.createElement("input");
-  textBox.id = id;
-  textBox.type = "text";
-  textBox.value = value;
-  textBox.dataset.default = value;
-  textBox.required = required;
-  textBox.name = id;
-  textBox.classList = "reset";
-  element.appendChild(textBox);
-
-  return element;
-}
-
-function createNumberInput(id, title, value, required) {
-  const element = document.createElement("div");
-
-  const label = document.createElement("label");
-  label.for = id;
-  label.classList = "form-label p-2";
-  label.innerText = title;
-  element.appendChild(label);
-
-  const num = document.createElement("input");
-  num.type = "number";
-  num.value = value;
-  num.dataset.default = value;
-  num.required = required;
-  num.name = id;
-  num.id = id;
-  num.classList = "reset";
-  num.required = required;
-  element.appendChild(num);
-
-  return element;
-}
-
-function createRangeBox(id, title, min, max, value, step, required) {
-  const element = document.createElement("div");
-
-  const label = document.createElement("label");
-  label.for = id;
-  label.innerText = title;
-  label.classList = "form-label p-2";
-  element.appendChild(label);
-
-  const rangeBox = document.createElement("input"); // TODO: replace with bootstrap rangebox
-  rangeBox.classList = "me-2 reset";
-  rangeBox.type = "range";
-  rangeBox.min = min;
-  rangeBox.max = max;
-  rangeBox.step = step;
-  rangeBox.id = id;
-  rangeBox.value = value;
-  rangeBox.dataset.default = value;
-  rangeBox.name = id;
-  rangeBox.required = required;
-  element.appendChild(rangeBox);
-
-  const output = document.createElement("output")
-  output.for = id;
-  output.classList = "form-label";
-  output.textContent = rangeBox.value;
-  element.appendChild(output);
-
-  rangeBox.addEventListener('input', function () {
-    output.textContent = this.value;
+  fields.forEach(field => {
+    fieldContainer.appendChild(renderField(field));
   });
 
-  return element;
+  form.appendChild(sectionDiv);
 }
 
-function createSelectBox(id, title, options, defaultOption) {
-  let element = document.createElement("div");
-  element.style.marginBottom = "15px";
+function renderField(field) {
+  const { type } = field;
 
-  let label = document.createElement("label");
-  label.for = id;
-  label.innerText = title;
-  label.classList = "form-label";
-  element.appendChild(label);
+  const factories = {
+    text: createTextBox,
+    number: createNumberInput,
+    checkbox: createCheckBox,
+    range: createRangeBox,
+    select: createSelectBox,
+    spinbox: createSpinBox
+  };
 
-  const selectBox = document.createElement("select"); // TODO: replace with bootstrap selectbox
-  selectBox.classList = "form-select reset";
-  selectBox.name = id;
-  selectBox.id = id;
-  selectBox.dataset.default = defaultOption;
-  for (let option in options) {
-    const optionElement = document.createElement("option");
-    optionElement.value = option;
-    optionElement.text = options[option];
-    selectBox.appendChild(optionElement);
+  return factories[type](field);
+}
+
+/*
+ *  Factory Functions 
+ */
+function createTextBox({ code, title, defaultValue, required }) {
+  const el = wrapper();
+  el.appendChild(labelFor(code, title));
+
+  const input = inputBase("text", code, defaultValue, required);
+  el.appendChild(input);
+
+  return el;
+}
+
+function createNumberInput({ code, title, defaultValue, required }) {
+  const el = wrapper();
+  el.appendChild(labelFor(code, title));
+
+  const input = inputBase("number", code, defaultValue, required);
+  el.appendChild(input);
+
+  return el;
+}
+
+function createCheckBox({ code, title, defaultValue, required }) {
+  const el = createElement("div", "form-check");
+
+  const input = createElement("input", "form-check-input reset");
+  input.type = "checkbox";
+  input.id = code;
+  input.name = code;
+  input.checked = defaultValue;
+  input.dataset.default = defaultValue;
+  input.required = required;
+
+  const lbl = createElement("label", "form-check-label");
+  lbl.htmlFor = code;
+  lbl.innerText = title;
+
+  el.append(lbl, input);
+  return el;
+}
+
+function createSpinBox({ code, title, min = 0, max = 10, step = 1, defaultValue = 0, required }) {
+  const el = wrapper();
+  el.appendChild(labelFor(code, title));
+
+  const spinBox = createElement("div", "input-group spinbox-group flex-nowrap center");
+
+  const decrement = button("-", () => changeSpin(code, -step, min, max));
+  const increment = button("+", () => changeSpin(code, step, min, max));
+  const input = inputBase("number", code, defaultValue, required);
+
+  // numeric attributes
+  input.min = min;
+  input.max = max;
+  input.step = step;
+
+  spinBox.append(decrement, input, increment);
+  el.appendChild(spinBox);
+  return el;
+}
+
+function createRangeBox({ code, title, min = 0, max = 10, step = 1, defaultValue = null, required }) {
+  const el = wrapper();
+  el.appendChild(labelFor(code, title));
+
+  const actualDefault = defaultValue ?? min;
+  const range = inputBase("range", code, actualDefault, required);
+  range.min = min;
+  range.max = max;
+  range.step = step;
+
+  const output = createElement("output", "form-label");
+  output.textContent = actualDefault;
+
+  range.addEventListener("input", () => {
+    output.textContent = range.value;
+  });
+
+  el.append(range, output);
+  return el;
+}
+
+function createSelectBox({ code, title, choices, defaultValue }) {
+  const el = wrapper();
+  el.appendChild(labelFor(code, title));
+
+  const select = createElement("select", "form-select reset");
+  select.id = code;
+  select.name = code;
+  select.dataset.default = defaultValue;
+
+  for (let key in choices) {
+    const option = document.createElement("option");
+    option.value = key;
+    option.textContent = choices[key];
+    select.appendChild(option);
   }
-  element.appendChild(selectBox);
 
-  return element;
+  select.value = defaultValue; // FIXED
+  el.appendChild(select);
+  return el;
 }
 
-
-function incrementValue(e, max, step) {
-  const input = document.getElementById(e.dataset.field);
-  let currentVal = parseInt(input.value, 10) || 0;
-
-  if (currentVal < max) input.value = currentVal + step;
-}
-
-function decrementValue(e, min, step) {
-  const input = document.getElementById(e.dataset.field);
-  let currentVal = parseInt(input.value, 10) || 0;
-
-  if (currentVal > min) input.value = currentVal - step;
-}
-
+/*
+* Form Functions
+*/
 function submitFunction(e) {
   e.preventDefault();
+  const formData = Object.fromEntries(new FormData(e.target).entries());
 
-  const formData = new FormData(e.target);
-  const data = Object.fromEntries(formData.entries());
   fetch('/submit-form', {
     method: 'POST',
-    body: JSON.stringify(data),
-    headers: {
-      'Content-Type': 'application/json'
-    }
-  })
-  console.log(data);
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(formData)
+  });
+
+  console.log(formData);
 }
 
 function resetFunction(e) {
   e.preventDefault();
-
   console.log("reset");
 
-  let elements = document.getElementsByClassName("reset");
-  for (let element of elements) {
-    if (element.id == "matchNumber") {
-      element.value = parseInt(element.value) + 1;
-    } else if (element.classList.contains("form-check-input")) {
-      element.checked = element.dataset.default == "true" ? true : false;
-    } else if (element.id != "scouter" && element.id != "robot") {
+  for (let element of document.getElementsByClassName("reset")) {
+    if (element.id === "matchNumber") {
+      const num = parseInt(element.value);
+      element.value = isNaN(num) ? 1 : num + 1;
+      continue;
+    }
+
+    if (element.type === "checkbox") {
+      element.checked = element.dataset.default === "true";
+      continue;
+    }
+
+    if (element.tagName === "SELECT") {
       element.value = element.dataset.default;
+      continue;
+    }
+
+    element.value = element.dataset.default;
+
+    if (element.type === "range") {
+      const output = element.nextElementSibling;
+      if (output) output.textContent = element.value;
     }
   }
+}
+
+/*
+ *  Element Constructors 
+ */
+
+function wrapper() {
+  return createElement("div");
+}
+
+function labelFor(id, text) {
+  const lbl = createElement("label", "form-label p-2");
+  lbl.htmlFor = id;
+  lbl.innerText = text;
+  return lbl;
+}
+
+function inputBase(type, id, value, required) {
+  const input = createElement("input", "reset");
+  input.type = type;
+  input.id = id;
+  input.name = id;
+  input.value = value;
+  input.dataset.default = value;
+  input.required = required;
+  return input;
+}
+
+function button(text, onClick) {
+  const btn = createElement("button", "btn btn-primary");
+  btn.type = "button";
+  btn.textContent = text;
+  btn.onclick = onClick;
+  return btn;
+}
+
+function changeSpin(id, delta, min, max) {
+  const input = document.getElementById(id);
+  let val = parseInt(input.value) || 0;
+  const newVal = Math.min(max, Math.max(min, val + delta));
+  input.value = newVal;
+}
+
+function createElement(tag, classList = "") {
+  const el = document.createElement(tag);
+  if (classList) el.className = classList;
+  return el;
+}
+
+function addFormButtons() {
+  const submitDiv = createElement("div", "row mt-3 mb-3");
+  const submit = createElement("input", "btn btn-primary d-block mt-2 center content-style1");
+  submit.type = "submit";
+  submitDiv.appendChild(submit);
+
+  const resetDiv = createElement("div");
+  const reset = createElement("input", "btn btn-secondary d-block mt-2 center content-style1");
+  reset.type = "reset";
+  reset.onclick = resetFunction;
+  resetDiv.appendChild(reset);
+
+  const getKeys = createElement("input", "btn btn-secondary d-block mt-2 center content-style1");
+  getKeys.type = "button";
+  getKeys.value = "Get Form Keys";
+  getKeys.onclick = () => {
+    const formData = new FormData(form);
+    console.log(Object.keys(Object.fromEntries(formData.entries())).join(", "));
+  };
+
+  form.append(submitDiv, resetDiv, getKeys);
 }
