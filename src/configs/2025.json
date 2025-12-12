@@ -4,55 +4,6 @@
     "page_title": "Reefscape",
     "sections": [
       {
-        "name": "Prematch",
-        "preserveDataOnReset": true,
-        "fields": [
-          {
-            "title": "Scouter Initials",
-            "type": "text",
-            "required": true,
-            "code": "scouter",
-            "defaultValue": ""
-          },
-          {
-            "title": "Match Number",
-            "type": "number",
-            "required": true,
-            "code": "matchNumber",
-            "defaultValue": "0"
-          },
-          {
-            "title": "Robot",
-            "type": "select",
-            "required": true,
-            "code": "robot",
-            "choices": {
-              "R1": "Red 1",
-              "R2": "Red 2",
-              "R3": "Red 3",
-              "B1": "Blue 1",
-              "B2": "Blue 2",
-              "B3": "Blue 3"
-            },
-            "defaultValue": "R1"
-          },
-          {
-            "title": "Team Number",
-            "type": "number",
-            "required": true,
-            "code": "teamNumber",
-            "defaultValue": "0"
-          },
-          {
-            "title": "No Show",
-            "type": "checkbox",
-            "defaultValue": false,
-            "required": false,
-            "code": "noShow"
-          }
-        ]
-      },
-      {
         "name": "Autonomous",
         "fields": [
           {
