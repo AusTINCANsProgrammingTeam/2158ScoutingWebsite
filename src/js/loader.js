@@ -15,7 +15,8 @@ const prematchConfig = {
       defaultValue: "R1"
     },
     { title: "Team Number", type: "number", required: true, code: "teamNumber", defaultValue: "0" },
-    { title: "No Show", type: "checkbox", code: "noShow", defaultValue: false }
+    { title: "No Show", type: "checkbox", code: "noShow", defaultValue: false },
+    { title: "Starting Position", type: "clickImg", required: true, imgSrc: "../img/field_2025_red.png", code: "startingPosition", defaultValue: "" }
   ]
 };
 
@@ -70,7 +71,8 @@ function renderField(field) {
     checkbox: createCheckBox,
     range: createRangeBox,
     select: createSelectBox,
-    spinbox: createSpinBox
+    spinbox: createSpinBox,
+    clickImg: createClickImage
   };
 
   return factories[type](field);
@@ -135,6 +137,49 @@ function createSpinBox({ code, title, min = 0, max = 10, step = 1, defaultValue 
 
   spinBox.append(decrement, input, increment);
   el.appendChild(spinBox);
+  return el;
+}
+
+function createClickImage({ code, title, imgSrc, defaultValue, required }) {
+  const el = wrapper();
+  el.appendChild(labelFor(code, title));
+
+  const canvas = document.createElement("canvas");
+  canvas.id = code;
+  canvas.style.border = "1px solid #000";
+  canvas.style.cursor = "crosshair";
+  el.appendChild(canvas);
+
+  const ctx = canvas.getContext("2d");
+
+  const img = new Image();
+  img.src = imgSrc;
+
+  img.onload = function () {
+    canvas.width = img.naturalWidth;
+    canvas.height = img.naturalHeight;
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+  };
+
+  canvas.addEventListener("click", function (event) {
+  const rect = canvas.getBoundingClientRect();
+
+  const x = Math.round(event.clientX - rect.left);
+  const y = Math.round(event.clientY - rect.top);
+
+  ctx.drawImage(img, 0, 0);
+
+  drawMarker(x, y);
+  console.log(`Clicked at: (${x}, ${y})`);
+});
+
+function drawMarker(x, y) {
+  let radius = 32
+  ctx.fillStyle = "red";
+  ctx.beginPath();
+  ctx.rect(x-radius/2, y-radius/2, radius, radius);
+  ctx.fill();
+}
   return el;
 }
 
@@ -229,7 +274,6 @@ function resetFunction(e) {
 /*
  *  Element Constructors 
  */
-
 function wrapper() {
   return createElement("div");
 }
