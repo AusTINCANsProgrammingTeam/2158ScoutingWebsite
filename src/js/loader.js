@@ -162,6 +162,7 @@ function createClickImage({ code, title, imgRed, imgBlue, defaultValue, required
   let currentImage = new Image();
   currentImage.src = imgRed;
   currentImage.onload = () => drawImage();
+  // Due to selection element not being rendered yet
   setTimeout(() => {
     var selectedRobot = document.getElementById("robot")
     selectedRobot.addEventListener("change", function () {
@@ -203,7 +204,11 @@ function createClickImage({ code, title, imgRed, imgBlue, defaultValue, required
 
   function drawMarker(x, y) {
     radius = 32
-    ctx.fillStyle = "red";
+    if (currentImage.src == imgBlue){
+      ctx.fillStyle = "blue";
+    } else {
+      ctx.fillStyle = "red";
+    }
     ctx.beginPath();
     ctx.rect(x-radius/2, y-radius/2, radius, radius);
     ctx.fill();
@@ -362,7 +367,9 @@ function addFormButtons() {
   getKeys.value = "Get Form Keys";
   getKeys.onclick = () => {
     const formData = new FormData(form);
-    console.log(Object.keys(Object.fromEntries(formData.entries())).join(", "));
+    const formKeys = Object.keys(Object.fromEntries(formData.entries()))
+    formKeys.push("startingPos")
+    console.log(formKeys.join(", "));
   };
 
   form.append(submitDiv, resetDiv, getKeys);
