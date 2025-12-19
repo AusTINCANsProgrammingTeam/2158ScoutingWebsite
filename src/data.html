@@ -12,14 +12,25 @@
     <div class="container-fluid">
         <h1 class="text-center mb-4">Reefscape Data Analysis</h1>
         
-        <!-- TODO: Make Section Hideable -->
-        <div class="card">
+        <div class="card" id="loaderCard">
             <div class="card-header">
                 Data Source
+                <button class="btn btn-sm btn-secondary float-end" onclick="toggleLoader()">Hide</button>
             </div>
             <div class="card-body">
                 <p id="loadingStatus" class="mb-2">Loading data from Google Sheets...</p>
                 <button class="btn btn-primary" onclick="generateSampleData()">Fake Data Test</button>
+            </div>
+        </div>
+
+        <div id="teamSelector" style="display:none;" class="card mb-3">
+            <div class="card-header">
+                Select Team
+            </div>
+            <div class="card-body">
+                <select id="teamSelect" class="form-select" onchange="updateTeamData()">
+                    <option value="">-- Select a Team --</option>
+                </select>
             </div>
         </div>
 
@@ -34,7 +45,7 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="card">
-                        <div class="card-header">Match Scores (Auto vs Teleop)</div>
+                        <div class="card-header">Match Scores</div>
                         <div class="card-body">
                             <div class="chart-container">
                                 <canvas id="scoringChart"></canvas>
@@ -45,11 +56,10 @@
                 
                 <div class="col-md-6">
                     <div class="card">
-                        <!-- TODO: Replace with Chart -->
-                        <div class="card-header"></div> 
+                        <div class="card-header">Scoring by Type per Match</div>
                         <div class="card-body">
                             <div class="chart-container">
-                                <!-- <canvas id="scoreByTypePerRound"></canvas> -->
+                                <canvas id="scoreByTypePerRound"></canvas>
                             </div>
                         </div>
                     </div>
@@ -59,11 +69,10 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="card">
-                        <!-- Replace with Chart -->
-                        <div class="card-header"></div>
+                        <div class="card-header">Team Skills Overview</div>
                         <div class="card-body">
                             <div class="chart-container">
-                                <!-- <canvas id="radarChart"></canvas> -->
+                                <canvas id="radarChart"></canvas>
                             </div>
                         </div>
                     </div>
@@ -71,15 +80,26 @@
                 
                 <div class="col-md-6">
                     <div class="card">
-                        <div class="card-header">Rounds With Penalties</div>
+                        <div class="card-header">Matches With Penalties</div>
                         <div class="card-body">
+                            <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                                <table class="table table-dark table-sm" id="penaltyTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Match</th>
+                                            <th>Team</th>
+                                            <th>Penalty Type</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="penaltyTableBody"></tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Team Comparison Table -->
         <div id="teamTable" style="display:none;">
             <h2 class="mt-4 mb-3">Team Rankings</h2>
             <div class="card">
@@ -105,7 +125,6 @@
             </div>
         </div>
 
-        <!-- TODO: Detailed Team View -->
         <div id="teamDetail" style="display:none;" class="card mt-4">
             <div class="card-header">
                 <h3 class="mb-0">Team <span id="detailTeamNumber"></span> Details</h3>

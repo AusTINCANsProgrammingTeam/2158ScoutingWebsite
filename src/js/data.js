@@ -1,9 +1,23 @@
 let scoutingData = [];
 let charts = {};
+let selectedTeam = null;
 
 document.addEventListener('DOMContentLoaded', () => {
     loadDataFromServer();
 });
+
+function toggleLoader() {
+    const card = document.getElementById('loaderCard');
+    const btn = card.querySelector('button');
+    
+    if (card.style.display === 'none') {
+        card.style.display = 'block';
+        btn.textContent = 'Hide';
+    } else {
+        card.style.display = 'none';
+        btn.textContent = 'Show';
+    }
+}
 
 async function loadDataFromServer() {
     const statusEl = document.getElementById('loadingStatus');
@@ -83,125 +97,47 @@ function generateSampleData() {
 function analyzeData() {
     if (scoutingData.length === 0) return;
 
-    displaySummaryStats();
-    createCharts();
+    populateTeamSelector();
     displayTeamTable();
-
-    document.getElementById('summaryStats').style.display = 'block';
-    document.getElementById('chartsSection').style.display = 'block';
+    
+    document.getElementById('teamSelector').style.display = 'block';
     document.getElementById('teamTable').style.display = 'block';
 }
 
-function displaySummaryStats() {
-    const totalMatches = scoutingData.length;
-    const avgCoralAuto = average(scoutingData.map(d => 
-        num(d.AutoCorL1) + num(d.AutoCorL2) + num(d.AutoCorL3) + num(d.AutoCorL4)
-    ));
-    const avgCoralTele = average(scoutingData.map(d => 
-        num(d.TeleCorL1) + num(d.TeleCorL2) + num(d.TeleCorL3) + num(d.TeleCorL4)
-    ));
-    const climbRate = (scoutingData.filter(d => d.endgamePos === 'Sh' || d.endgamePos === 'Os').length / totalMatches * 100).toFixed(1);
-
-    const stats = [
-        { label: 'Total Matches', value: totalMatches },
-        { label: 'Avg Auto Coral', value: avgCoralAuto.toFixed(1) },
-        { label: 'Avg Teleop Coral', value: avgCoralTele.toFixed(1) },
-        { label: 'Endgame Success', value: climbRate + '%' }
-    ];
-
-    const statsRow = document.getElementById('statsRow');
-    statsRow.innerHTML = stats.map(stat => `
-        <div class="col-md-3">
-            <div class="stat-box">
-                <p>${stat.label}</p>
-                <h3>${stat.value}</h3>
-            </div>
-        </div>
-    `).join('');
+function populateTeamSelector() {
+    const teams = [...new Set(scoutingData.map(d => d.teamNumber))].sort((a, b) => a - b);
+    const select = document.getElementById('teamSelect');
+    
+    select.innerHTML = '<option value="">-- Select a Team --</option>' + 
+        teams.map(team => `<option value="${team}">${team}</option>`).join('');
 }
 
-function createCharts() {
-    Object.values(charts).forEach(chart => chart?.destroy());
-
-    const matchNumbers = [...new Set(scoutingData.map(d => num(d.matchNumber)))].sort((a, b) => a - b);
+function updateTeamData() {
+    const select = document.getElementById('teamSelect');
+    selectedTeam = select.value;
     
-    const autoScores = matchNumbers.map(match => {
-        const matchData = scoutingData.filter(d => num(d.matchNumber) === match);
-        return sum(matchData.map(d => 
-            num(d.AutoCorL1) * 3 + 
-            num(d.AutoCorL2) * 4 + 
-            num(d.AutoCorL3) * 6 + 
-            num(d.AutoCorL4) * 7 +
-            num(d.AutoAlgProcess) * 6 +
-            num(d.AutoAlgNet) * 4
-        ));
-    });
-
-    const teleopScores = matchNumbers.map(match => {
-        const matchData = scoutingData.filter(d => num(d.matchNumber) === match);
-        return sum(matchData.map(d => 
-            num(d.TeleCorL1) * 2 + 
-            num(d.TeleCorL2) * 3 + 
-            num(d.TeleCorL3) * 4 + 
-            num(d.TeleCorL4) * 5 +
-            num(d.TeleAlgProcess) * 6 +
-            num(d.TeleAlgNet) * 4
-        ));
-    });
-
-    const scoringData = {
-        labels: matchNumbers.map(m => `Match ${m}`),
-        datasets: [{
-            label: 'Auto',
-            data: autoScores,
-            backgroundColor: '#FFF01F',
-            borderColor: '#FFF01F',
-            borderWidth: 1
-        }, {
-            label: 'Teleop',
-            data: teleopScores,
-            backgroundColor: '#0dcaf0',
-            borderColor: '#0dcaf0',
-            borderWidth: 1
-        }]
-    };
-
-    charts.scoring = new Chart(document.getElementById('scoringChart'), {
-        type: 'bar',
-        data: scoringData,
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: { 
-                y: { 
-                    beginAtZero: true,
-                    title: {
-                        display: true,
-                        text: 'Points'
-                    }
-                },
-                x: {
-                    title: {
-                        display: true,
-                        text: 'Match Number'
-                    }
-                }
-            }
-        }
-    });
-
-    const teamData = aggregateByTeam();
+    if (!selectedTeam) {
+        document.getElementById('summaryStats').style.display = 'none';
+        document.getElementById('chartsSection').style.display = 'none';
+        return;
+    }
+    
+    displaySummaryStats();
+    createCharts();
+    
+    document.getElementById('summaryStats').style.display = 'block';
+    document.getElementById('chartsSection').style.display = 'block';
 }
 
 function displayTeamTable() {
     const teamData = aggregateByTeam();
-    const sorted = Object.entries(teamData).sort((a, b) => // Sort by avgTotalCoral
+    const sorted = Object.entries(teamData).sort((a, b) => 
         (b[1].avgTotalCoral) - (a[1].avgTotalCoral)
     );
 
     const tbody = document.getElementById('teamTableBody');
     tbody.innerHTML = sorted.map(([team, stats], index) => `
-        <tr class="team-row" onclick="showTeamDetail('${team}')">
+        <tr class="team-row" onclick="selectTeamFromTable('${team}')">
             <td>${index + 1}</td>
             <td>${team}</td>
             <td>${stats.avgTotalCoral.toFixed(1)}</td>
@@ -212,6 +148,12 @@ function displayTeamTable() {
             <td>${stats.matches}</td>
         </tr>
     `).join('');
+}
+
+function selectTeamFromTable(team) {
+    document.getElementById('teamSelect').value = team;
+    updateTeamData();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function aggregateByTeam() {
@@ -258,10 +200,37 @@ function aggregateByTeam() {
 
 function showTeamDetail(teamNumber) {
     const teamMatches = scoutingData.filter(d => d.teamNumber == teamNumber);
+    const teamStats = aggregateByTeam()[teamNumber];
     
     document.getElementById('detailTeamNumber').textContent = teamNumber;
     
     const html = `
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="stat-box">
+                    <p>Avg Auto Coral</p>
+                    <h3>${teamStats.avgAutoCoral.toFixed(1)}</h3>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-box">
+                    <p>Avg Teleop Coral</p>
+                    <h3>${teamStats.avgTeleCoral.toFixed(1)}</h3>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-box">
+                    <p>Offense Rating</p>
+                    <h3>${teamStats.avgOffense.toFixed(1)}</h3>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-box">
+                    <p>Defense Rating</p>
+                    <h3>${teamStats.avgDefense.toFixed(1)}</h3>
+                </div>
+            </div>
+        </div>
         <h4>Match History</h4>
         <div class="table-responsive">
             <table class="table table-dark table-sm">
@@ -272,6 +241,7 @@ function showTeamDetail(teamNumber) {
                         <th>Tele Coral</th>
                         <th>Algae</th>
                         <th>Endgame</th>
+                        <th>Fouls</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -282,6 +252,7 @@ function showTeamDetail(teamNumber) {
                             <td>${num(m.TeleCorL1) + num(m.TeleCorL2) + num(m.TeleCorL3) + num(m.TeleCorL4)}</td>
                             <td>${num(m.AutoAlgProcess) + num(m.AutoAlgNet) + num(m.TeleAlgProcess) + num(m.TeleAlgNet)}</td>
                             <td>${m.endgamePos}</td>
+                            <td>${m.Fouls}</td>
                         </tr>
                     `).join('')}
                 </tbody>
@@ -304,4 +275,251 @@ function sum(arr) {
 
 function average(arr) {
     return arr.length ? sum(arr) / arr.length : 0;
+}
+
+function displaySummaryStats() {
+    if (!selectedTeam) return;
+    
+    const teamData = scoutingData.filter(d => d.teamNumber == selectedTeam);
+    const totalMatches = teamData.length;
+    
+    const avgCoralAuto = average(teamData.map(d => 
+        num(d.AutoCorL1) + num(d.AutoCorL2) + num(d.AutoCorL3) + num(d.AutoCorL4)
+    ));
+    const avgCoralTele = average(teamData.map(d => 
+        num(d.TeleCorL1) + num(d.TeleCorL2) + num(d.TeleCorL3) + num(d.TeleCorL4)
+    ));
+    const climbRate = (teamData.filter(d => d.endgamePos === 'Sh' || d.endgamePos === 'Os').length / totalMatches * 100).toFixed(1);
+
+    const stats = [
+        { label: 'Total Matches', value: totalMatches },
+        { label: 'Avg Auto Coral', value: avgCoralAuto.toFixed(1) },
+        { label: 'Avg Teleop Coral', value: avgCoralTele.toFixed(1) },
+        { label: 'Endgame Success', value: climbRate + '%' }
+    ];
+
+    const statsRow = document.getElementById('statsRow');
+    statsRow.innerHTML = stats.map(stat => `
+        <div class="col-md-3">
+            <div class="stat-box">
+                <p>${stat.label}</p>
+                <h3>${stat.value}</h3>
+            </div>
+        </div>
+    `).join('');
+}
+
+function createCharts() {
+    if (!selectedTeam) return;
+    
+    Object.values(charts).forEach(chart => chart?.destroy());
+
+    const teamData = scoutingData.filter(d => d.teamNumber == selectedTeam);
+    const matchNumbers = [...new Set(teamData.map(d => num(d.matchNumber)))].sort((a, b) => a - b);
+    
+    const autoScores = matchNumbers.map(match => {
+        const matchData = teamData.filter(d => num(d.matchNumber) === match);
+        return sum(matchData.map(d => 
+            num(d.AutoCorL1) * 3 + 
+            num(d.AutoCorL2) * 4 + 
+            num(d.AutoCorL3) * 6 + 
+            num(d.AutoCorL4) * 7 +
+            num(d.AutoAlgProcess) * 6 +
+            num(d.AutoAlgNet) * 4
+        ));
+    });
+
+    const teleopScores = matchNumbers.map(match => {
+        const matchData = teamData.filter(d => num(d.matchNumber) === match);
+        return sum(matchData.map(d => 
+            num(d.TeleCorL1) * 2 + 
+            num(d.TeleCorL2) * 3 + 
+            num(d.TeleCorL3) * 4 + 
+            num(d.TeleCorL4) * 5 +
+            num(d.TeleAlgProcess) * 6 +
+            num(d.TeleAlgNet) * 4
+        ));
+    });
+
+    charts.scoring = new Chart(document.getElementById('scoringChart'), {
+        type: 'bar',
+        data: {
+            labels: matchNumbers.map(m => `Match ${m}`),
+            datasets: [{
+                label: 'Auto',
+                data: autoScores,
+                backgroundColor: '#FFF01F',
+                borderColor: '#FFF01F',
+                borderWidth: 1
+            }, {
+                label: 'Teleop',
+                data: teleopScores,
+                backgroundColor: '#0dcaf0',
+                borderColor: '#0dcaf0',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: { 
+                y: { 
+                    beginAtZero: true,
+                    title: { display: true, text: 'Points' }
+                },
+                x: {
+                    title: { display: true, text: 'Match Number' }
+                }
+            }
+        }
+    });
+
+    const l1Scores = matchNumbers.map(match => {
+        const matchData = teamData.filter(d => num(d.matchNumber) === match);
+        return sum(matchData.map(d => num(d.TeleCorL1)));
+    });
+    
+    const l2Scores = matchNumbers.map(match => {
+        const matchData = teamData.filter(d => num(d.matchNumber) === match);
+        return sum(matchData.map(d => num(d.TeleCorL2)));
+    });
+    
+    const l3Scores = matchNumbers.map(match => {
+        const matchData = teamData.filter(d => num(d.matchNumber) === match);
+        return sum(matchData.map(d => num(d.TeleCorL3)));
+    });
+    
+    const l4Scores = matchNumbers.map(match => {
+        const matchData = teamData.filter(d => num(d.matchNumber) === match);
+        return sum(matchData.map(d => num(d.TeleCorL4)));
+    });
+
+    charts.scoreByType = new Chart(document.getElementById('scoreByTypePerRound'), {
+        type: 'bar',
+        data: {
+            labels: matchNumbers.map(m => `M${m}`),
+            datasets: [{
+                label: 'L1',
+                data: l1Scores,
+                backgroundColor: '#FFF01F'
+            }, {
+                label: 'L2',
+                data: l2Scores,
+                backgroundColor: '#0dcaf0'
+            }, {
+                label: 'L3',
+                data: l3Scores,
+                backgroundColor: '#198754'
+            }, {
+                label: 'L4',
+                data: l4Scores,
+                backgroundColor: '#dc3545'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: { 
+                y: { 
+                    beginAtZero: true,
+                    title: { display: true, text: 'Amount Scored' }
+                },
+                x: {
+                    title: { display: true, text: 'Match' }
+                }
+            }
+        }
+    });
+
+    const allTeamData = aggregateByTeam();
+    const thisTeam = allTeamData[selectedTeam];
+    
+    const allOffenseRatings = Object.values(allTeamData).map(t => t.avgOffense).sort((a, b) => a - b);
+    const allDefenseRatings = Object.values(allTeamData).map(t => t.avgDefense).sort((a, b) => a - b);
+    
+    const avgStats = {
+        avgDefense: getPercentile(thisTeam.avgDefense, allDefenseRatings),
+        avgOffense: getPercentile(thisTeam.avgOffense, allOffenseRatings),
+        avgTeleopScore: thisTeam.avgTeleCoral,
+        avgAutoScore: thisTeam.avgAutoCoral,
+        avgEndgame: thisTeam.climbRate
+    };
+
+    charts.radar = new Chart(document.getElementById('radarChart'), {
+        type: 'radar',
+        data: {
+            labels: ['Defense', 'Offense', 'Teleop Score', 'Auto Score', 'Endgame %'],
+            datasets: [{
+                label: 'Team Performance',
+                data: [
+                    avgStats.avgDefense,
+                    avgStats.avgOffense,
+                    avgStats.avgTeleopScore,
+                    avgStats.avgAutoScore,
+                    avgStats.avgEndgame / 10
+                ],
+                backgroundColor: 'rgba(255, 240, 31, 0.2)',
+                borderColor: '#FFF01F',
+                borderWidth: 2,
+                pointBackgroundColor: '#FFF01F',
+                pointBorderColor: '#CCBE00',
+                pointRadius: 5
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                r: {
+                    beginAtZero: true,
+                    max: 10,
+                    ticks: {
+                        display: false
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+
+    const penaltyMatches = [];
+    teamData.forEach(d => {
+        const penalties = [];
+        if (num(d.Fouls) > 0) penalties.push(`Fouls (${d.Fouls})`);
+        if (d.AutoFoul === 'true') penalties.push('Auto Foul');
+        if (d.YRCard === 'true') penalties.push('Yellow/Red Card');
+        if (d.Died === 'true') penalties.push('Died');
+        if (d.Tipped === 'true') penalties.push('Tipped');
+        
+        penalties.forEach(penalty => {
+            penaltyMatches.push({
+                match: d.matchNumber,
+                team: d.teamNumber,
+                penalty: penalty
+            });
+        });
+    });
+
+    const tbody = document.getElementById('penaltyTableBody');
+    tbody.innerHTML = penaltyMatches.map(p => `
+        <tr>
+            <td>${p.match}</td>
+            <td>${p.team}</td>
+            <td>${p.penalty}</td>
+        </tr>
+    `).join('');
+}
+
+function getPercentile(value, sortedArray) {
+    if (sortedArray.length === 0) return 0;
+    
+    let count = 0;
+    for (let i = 0; i < sortedArray.length; i++) {
+        if (sortedArray[i] <= value) count++;
+    }
+    return (count / sortedArray.length) * 10;
 }
