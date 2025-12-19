@@ -9,7 +9,9 @@
   "scripts": {
     "start": "node main.js",
     "dev": "npm run scss:build & npm run start & npm run scss:watch",
-    "scss:build": "sass src/scss/style.scss src/css/style.css",
+    "scss:build": "npm run scss:build_index & npm run scss:build_data",
+    "scss:build_index": "sass src/scss/style.scss src/css/style.css",
+    "scss:build_data": "sass src/scss/data.scss src/css/data.css",
     "scss:watch": "sass --watch src/scss:src/css"
   },
   "dependencies": {

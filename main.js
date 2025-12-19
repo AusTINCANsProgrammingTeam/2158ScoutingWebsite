@@ -32,14 +32,44 @@ app.get('/', (req, res) => {
     res.sendFile('src/index.html', {root: __dirname })
 })
 
-app.listen(port, () => {
-    console.log("webber")
+app.get('/data', (req, res) => {
+    res.sendFile('src/data.html', {root: __dirname })
+})
+
+app.get('/get-data', async (req, res) => {
+  try {
+    await sheet.loadCells();
+    const rows = await sheet.getRows();
+    
+    const data = rows.map(row => {
+      const rowData = {};
+      sheet.headerValues.forEach(header => {
+        rowData[header] = row.get(header) || '';
+      });
+      return rowData;
+    });
+
+    res.json({
+      success: true,
+      rows: data,
+      count: data.length
+    });
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch data from spreadsheet'
+    });
+  }
 })
 
 app.post('/submit-form', (req, res) => {
   const formData = req.body;
   console.log('Form Data Received:', formData);
-//   res.send(`Registration successful for ${formData.name}!`);
   
   sheet.addRow(formData);
+})
+
+app.listen(port, () => {
+    console.log(`Server running on http://localhost:${port}`)
 })

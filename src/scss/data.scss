@@ -72,11 +72,23 @@ $text-color: #dee2e6;
   h3 {
     font-size: 2.5em;
     margin: 10px 0;
+    color: $label-color;
   }
 
   p {
     color: $label-color;
     margin: 0;
+  }
+}
+
+.btn-primary {
+  background-color: $primary;
+  border-color: $primary;
+  color: #000;
+
+  &:hover {
+    background-color: $label-color;
+    border-color: $label-color;
   }
 }
 
@@ -110,7 +122,6 @@ table {
   height: 400px;
   margin-bottom: 30px;
 }
-
 
 input[type="range"] {
   -webkit-appearance: none;
@@ -149,4 +160,8 @@ input[type="range"] {
     border-radius: 50%;
     border: 2px solid $label-color;
   }
+}
+
+h1, h2 {
+  color: $label-color;
 }
