@@ -1,13 +1,119 @@
-<html>
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title></title>
-        <meta name="description" content="">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="">
-    </head>
-    <body>        
-        <script src="" async defer></script>
-    </body>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Analysis</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/data.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="background">
+    <div class="container-fluid">
+        <h1 class="text-center mb-4">Reefscape Data Analysis</h1>
+        
+        <!-- TODO: Make Section Hideable -->
+        <div class="card">
+            <div class="card-header">
+                Data Source
+            </div>
+            <div class="card-body">
+                <p id="loadingStatus" class="mb-2">Loading data from Google Sheets...</p>
+                <button class="btn btn-primary" onclick="generateSampleData()">Fake Data Test</button>
+            </div>
+        </div>
+
+        <div id="summaryStats" style="display:none;">
+            <h2 class="mt-4 mb-3">Summary Statistics</h2>
+            <div class="row" id="statsRow"></div>
+        </div>
+
+        <div id="chartsSection" style="display:none;">
+            <h2 class="mt-4 mb-3">Performance Charts</h2>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">Match Scores (Auto vs Teleop)</div>
+                        <div class="card-body">
+                            <div class="chart-container">
+                                <canvas id="scoringChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="card">
+                        <!-- TODO: Replace with Chart -->
+                        <div class="card-header"></div> 
+                        <div class="card-body">
+                            <div class="chart-container">
+                                <!-- <canvas id="scoreByTypePerRound"></canvas> -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card">
+                        <!-- Replace with Chart -->
+                        <div class="card-header"></div>
+                        <div class="card-body">
+                            <div class="chart-container">
+                                <!-- <canvas id="radarChart"></canvas> -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">Rounds With Penalties</div>
+                        <div class="card-body">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Team Comparison Table -->
+        <div id="teamTable" style="display:none;">
+            <h2 class="mt-4 mb-3">Team Rankings</h2>
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-dark table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Rank</th>
+                                    <th>Team</th>
+                                    <th>Avg Coral</th>
+                                    <th>Avg Algae</th>
+                                    <th>Endgame %</th>
+                                    <th>Offense</th>
+                                    <th>Defense</th>
+                                    <th>Matches</th>
+                                </tr>
+                            </thead>
+                            <tbody id="teamTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TODO: Detailed Team View -->
+        <div id="teamDetail" style="display:none;" class="card mt-4">
+            <div class="card-header">
+                <h3 class="mb-0">Team <span id="detailTeamNumber"></span> Details</h3>
+            </div>
+            <div class="card-body" id="teamDetailBody"></div>
+        </div>
+    </div>
+
+    <script src="/js/data.js"></script>
+</body>
 </html>

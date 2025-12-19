@@ -146,11 +146,14 @@ function createSpinBox({ code, title, min = 0, max = 10, step = 1, defaultValue 
 function createClickImage({ code, title, imgRed, imgBlue, defaultValue, required }) {
   const el = wrapper();
   el.appendChild(labelFor(code, title));
+  el.classList = "center"
 
   const canvas = document.createElement("canvas");
+  canvas.classList = "center"
   canvas.id = code;
-  canvas.style.border = "1px solid #000";
   canvas.style.cursor = "crosshair";
+  canvas.width  = window.innerWidth;
+  canvas.height = window.innerHeight;
   el.appendChild(canvas);
 
   const ctx = canvas.getContext("2d");
@@ -237,7 +240,7 @@ function createRangeBox({ code, title, min = 0, max = 10, step = 1, defaultValue
   return el;
 }
 
-function createSelectBox({ code, title, choices, defaultValue }) {
+function createSelectBox({ code, title, choices, defaultValue, required }) {
   const el = wrapper();
   el.appendChild(labelFor(code, title));
 
@@ -245,6 +248,7 @@ function createSelectBox({ code, title, choices, defaultValue }) {
   select.id = code;
   select.name = code;
   select.dataset.default = defaultValue;
+  select.required = required
 
   for (let key in choices) {
     const option = document.createElement("option");
@@ -323,6 +327,7 @@ function inputBase(type, id, value, required) {
   input.type = type;
   input.id = id;
   input.name = id;
+  input.classList = "form-control"
   input.value = value;
   input.dataset.default = value;
   input.required = required;
