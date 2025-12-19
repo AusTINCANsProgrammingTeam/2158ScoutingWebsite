@@ -445,10 +445,11 @@ function createCharts() {
         avgEndgame: thisTeam.climbRate
     };
 
+    // TODO: Make replace subjective rankings with DPR and OPR
     charts.radar = new Chart(document.getElementById('radarChart'), {
         type: 'radar',
         data: {
-            labels: ['Defense', 'Offense', 'Teleop Score', 'Auto Score', 'Endgame %'],
+            labels: ['Defense Subjective', 'Offense Subjective', 'Avg Teleop Score', 'Avg Auto Score', 'Endgame %'],
             datasets: [{
                 label: 'Team Performance',
                 data: [
@@ -472,10 +473,17 @@ function createCharts() {
             scales: {
                 r: {
                     beginAtZero: true,
-                    max: 10,
+                    suggestedMax: 10,
+                    suggestedMin: 0,
                     ticks: {
                         display: false
-                    }
+                    },
+                    pointLabels: {
+                        font: {
+                            size: 14 
+                        }
+                    },
+                    padding: 10
                 }
             },
             plugins: {
@@ -514,12 +522,23 @@ function createCharts() {
     `).join('');
 }
 
-function getPercentile(value, sortedArray) {
-    if (sortedArray.length === 0) return 0;
-    
-    let count = 0;
-    for (let i = 0; i < sortedArray.length; i++) {
-        if (sortedArray[i] <= value) count++;
+function getPercentile(value, arr) {
+    if (arr.length === 0) return 0;
+
+    let countBelow = 0;
+    let countEqual = 0;
+    const N = arr.length;
+
+    for (let i = 0; i < N; i++) {
+        if (arr[i] < value) {
+            countBelow++;
+        } else if (arr[i] === value) {
+            countEqual++;
+        } else {
+            break;
+        }
     }
-    return (count / sortedArray.length) * 10;
+
+    const percentile = (countBelow + (0.5 * countEqual)) / N * 100;
+    return percentile/10;
 }

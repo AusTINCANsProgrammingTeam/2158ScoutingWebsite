@@ -104,6 +104,7 @@ function createNumberInput({ code, title, defaultValue, required }) {
   return el;
 }
 
+// TODO: Fix checkboxes not being added to form submit
 function createCheckBox({ code, title, defaultValue, required }) {
   const el = createElement("div", "form-check");
 
