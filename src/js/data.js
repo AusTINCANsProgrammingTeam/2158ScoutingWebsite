@@ -117,15 +117,15 @@ function updateTeamData() {
     selectedTeam = select.value;
     
     if (!selectedTeam) {
-        document.getElementById('summaryStats').style.display = 'none';
+        document.getElementById('teamDetail').style.display = 'none';
         document.getElementById('chartsSection').style.display = 'none';
         return;
     }
     
-    displaySummaryStats();
+    showTeamDetail(selectedTeam);
     createCharts();
     
-    document.getElementById('summaryStats').style.display = 'block';
+    document.getElementById('teamDetail').style.display = 'block';
     document.getElementById('chartsSection').style.display = 'block';
 }
 
@@ -168,6 +168,8 @@ function aggregateByTeam() {
                 totalTeleCoral: 0,
                 totalAutoAlgae: 0,
                 totalTeleAlgae: 0,
+                totalTeleopScore: 0,
+                totalAutoScore: 0,
                 climbs: 0,
                 totalOffense: 0,
                 totalDefense: 0
@@ -179,6 +181,18 @@ function aggregateByTeam() {
         teams[team].totalTeleCoral += num(d.TeleCorL1) + num(d.TeleCorL2) + num(d.TeleCorL3) + num(d.TeleCorL4);
         teams[team].totalAutoAlgae += num(d.AutoAlgProcess) + num(d.AutoAlgNet);
         teams[team].totalTeleAlgae += num(d.TeleAlgProcess) + num(d.TeleAlgNet);
+        teams[team].totalTeleopScore += num(d.TeleCorL1) * 2 + 
+            num(d.TeleCorL2) * 3 + 
+            num(d.TeleCorL3) * 4 + 
+            num(d.TeleCorL4) * 5 +
+            num(d.TeleAlgProcess) * 6 +
+            num(d.TeleAlgNet) * 4;
+        teams[team].totalAutoScore += num(d.AutoCorL1) * 3 + 
+            num(d.AutoCorL2) * 4 + 
+            num(d.AutoCorL3) * 6 + 
+            num(d.AutoCorL4) * 7 +
+            num(d.AutoAlgProcess) * 6 +
+            num(d.AutoAlgNet) * 4;
         teams[team].climbs += (d.endgamePos === 'Sh' || d.endgamePos === 'Os') ? 1 : 0;
         teams[team].totalOffense += num(d.offskillrate);
         teams[team].totalDefense += num(d.defskillrate);
@@ -190,6 +204,8 @@ function aggregateByTeam() {
         t.avgTeleCoral = t.totalTeleCoral / t.matches;
         t.avgTotalCoral = (t.totalAutoCoral + t.totalTeleCoral) / t.matches;
         t.avgTotalAlgae = (t.totalAutoAlgae + t.totalTeleAlgae) / t.matches;
+        t.avgTeleopScore = t.totalTeleopScore / t.matches;
+        t.avgAutoScore = t.totalAutoScore / t.matches;
         t.climbRate = (t.climbs / t.matches) * 100;
         t.avgOffense = t.totalOffense / t.matches;
         t.avgDefense = t.totalDefense / t.matches;
@@ -208,14 +224,14 @@ function showTeamDetail(teamNumber) {
         <div class="row mb-4">
             <div class="col-md-3">
                 <div class="stat-box">
-                    <p>Avg Auto Coral</p>
-                    <h3>${teamStats.avgAutoCoral.toFixed(1)}</h3>
+                    <p>Avg Teleop Score</p>
+                    <h3>${teamStats.avgTeleopScore.toFixed(1)}</h3>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="stat-box">
-                    <p>Avg Teleop Coral</p>
-                    <h3>${teamStats.avgTeleCoral.toFixed(1)}</h3>
+                    <p>Avg Auto Score</p>
+                    <h3>${teamStats.avgAutoScore.toFixed(1)}</h3>
                 </div>
             </div>
             <div class="col-md-3">
@@ -275,38 +291,6 @@ function sum(arr) {
 
 function average(arr) {
     return arr.length ? sum(arr) / arr.length : 0;
-}
-
-function displaySummaryStats() {
-    if (!selectedTeam) return;
-    
-    const teamData = scoutingData.filter(d => d.teamNumber == selectedTeam);
-    const totalMatches = teamData.length;
-    
-    const avgCoralAuto = average(teamData.map(d => 
-        num(d.AutoCorL1) + num(d.AutoCorL2) + num(d.AutoCorL3) + num(d.AutoCorL4)
-    ));
-    const avgCoralTele = average(teamData.map(d => 
-        num(d.TeleCorL1) + num(d.TeleCorL2) + num(d.TeleCorL3) + num(d.TeleCorL4)
-    ));
-    const climbRate = (teamData.filter(d => d.endgamePos === 'Sh' || d.endgamePos === 'Os').length / totalMatches * 100).toFixed(1);
-
-    const stats = [
-        { label: 'Total Matches', value: totalMatches },
-        { label: 'Avg Auto Coral', value: avgCoralAuto.toFixed(1) },
-        { label: 'Avg Teleop Coral', value: avgCoralTele.toFixed(1) },
-        { label: 'Endgame Success', value: climbRate + '%' }
-    ];
-
-    const statsRow = document.getElementById('statsRow');
-    statsRow.innerHTML = stats.map(stat => `
-        <div class="col-md-3">
-            <div class="stat-box">
-                <p>${stat.label}</p>
-                <h3>${stat.value}</h3>
-            </div>
-        </div>
-    `).join('');
 }
 
 function createCharts() {
