@@ -31,7 +31,7 @@ async function loadDataFromServer() {
         
         if (data.success && data.rows.length > 0) {
             scoutingData = data.rows;
-            statusEl.textContent = `Successfully loaded ${data.rows.length} matches from Google Sheets`;
+            statusEl.textContent = `Successfully loaded ${data.rows.length} entries from Google Sheets`;
             statusEl.className = 'mb-2 text-success';
             analyzeData();
         } else {
@@ -44,54 +44,6 @@ async function loadDataFromServer() {
         statusEl.className = 'mb-2 text-danger';
         console.error('Error loading data:', error);
     }
-}
-
-function generateSampleData() {
-    const teams = [1234, 5678, 9012, 3456, 7890];
-    const robots = ['R1', 'R2', 'R3', 'B1', 'B2', 'B3'];
-    const endPositions = ['No', 'Pr', 'Sh', 'Os'];
-    
-    scoutingData = [];
-    
-    for (let match = 1; match <= 20; match++) {
-        for (let i = 0; i < 3; i++) {
-            const team = teams[Math.floor(Math.random() * teams.length)];
-            scoutingData.push({
-                matchNumber: match,
-                robot: robots[i],
-                teamNumber: team,
-                noShow: Math.random() < 0.05 ? 'true' : 'false',
-                AutoCorL1: Math.floor(Math.random() * 3),
-                AutoCorL2: Math.floor(Math.random() * 3),
-                AutoCorL3: Math.floor(Math.random() * 2),
-                AutoCorL4: Math.floor(Math.random() * 2),
-                AutoCorMissL4: Math.floor(Math.random() * 2),
-                AutoAlgProcess: Math.floor(Math.random() * 4),
-                AutoAlgNet: Math.floor(Math.random() * 3),
-                AutoFoul: Math.random() < 0.1 ? 'true' : 'false',
-                AutoLeave: Math.random() < 0.7 ? 'true' : 'false',
-                TeleCorL1: Math.floor(Math.random() * 8),
-                TeleCorL2: Math.floor(Math.random() * 6),
-                TeleCorL3: Math.floor(Math.random() * 5),
-                TeleCorL4: Math.floor(Math.random() * 4),
-                TeleCorMissL4: Math.floor(Math.random() * 3),
-                TeleAlgProcess: Math.floor(Math.random() * 10),
-                TeleAlgNet: Math.floor(Math.random() * 8),
-                endgamePos: endPositions[Math.floor(Math.random() * endPositions.length)],
-                CoralPickLoc: ['N', 'G', 'S', 'B'][Math.floor(Math.random() * 4)],
-                AlgaePickLoc: ['X', 'G', 'R', 'B'][Math.floor(Math.random() * 4)],
-                Fouls: Math.floor(Math.random() * 3),
-                Died: Math.random() < 0.05 ? 'true' : 'false',
-                Tipped: Math.random() < 0.03 ? 'true' : 'false',
-                YRCard: Math.random() < 0.02 ? 'true' : 'false',
-                offskillrate: Math.floor(Math.random() * 7) + 1,
-                defskillrate: Math.floor(Math.random() * 7) + 1,
-                comments: ''
-            });
-        }
-    }
-
-    analyzeData();
 }
 
 function analyzeData() {
