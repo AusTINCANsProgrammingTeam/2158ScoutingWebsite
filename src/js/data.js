@@ -526,3 +526,18 @@ function getPercentile(value, arr) {
     const percentile = (countBelow + (0.5 * countEqual)) / N * 100;
     return percentile/10;
 }
+
+/**
+ * TODO: Auto check match accuracy by comparing points scouted vs points from API,
+ *      - Compare Scoring breakdown from API vs scouted data
+ *      - Compare Fouls from API vs Fouls from scouted data
+ *      - Compare Endgame from API vs Endgame from scouted data
+ * TODO: Add API Data
+ *      - Add API Data to the team detail page, and add a toggle to show/hide API data
+ *      - Add API Data to the team table, and add a toggle to show/hide API data
+ * TODO: Add more charts
+ *     - Make different sorting
+ *     - Make toggleable fields
+ * (For Future) Migrate from Google Sheets to a Google Database service
+ * (For Future) Custom Charts
+ */
