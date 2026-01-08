@@ -243,6 +243,8 @@ function showTeamDetail(teamNumber) {
     document.getElementById('teamDetail').scrollIntoView({ behavior: 'smooth' });
 }
 
+
+//TODO: Use Factory Design Pattern for creation of charts
 function createCharts() {
     if (!selectedTeam) return;
     
