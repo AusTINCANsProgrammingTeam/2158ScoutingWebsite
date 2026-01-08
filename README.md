@@ -25,4 +25,8 @@ npm run start
 npm run scss:build
 ```
 
-### Contributing
+### Docs
+ - [Getting Started with Node.js](https://nodejs.org/en/learn/getting-started/introduction-to-nodejs)
+ - [Getting Started with Express.js](https://expressjs.com/en/starter/installing.html)
+ - [Getting Started with Bootstrap toolkit](https://getbootstrap.com/docs/5.3/getting-started/introduction/)
+ - [Learning SASS/SCSS](https://www.w3schools.com/sass/sass_intro.asp)
