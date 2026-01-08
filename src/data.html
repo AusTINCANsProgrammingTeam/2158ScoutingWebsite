@@ -70,11 +70,14 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="card">
-                        <div class="card-header">Team Skills Overview</div>
+                        <div class="card-header">Team Skills Overview (Percentile)</div>
                         <div class="card-body">
                             <div class="chart-container">
                                 <canvas style="background-color:white;" id="radarChart"></canvas>
                             </div>
+                            <p class="text-muted text-center mt-2 mb-0">
+                                <small>Values shown as percentile rank (0-10 scale) compared to all teams</small>
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -102,12 +105,17 @@
         </div>
 
         <div id="teamTable" style="display:none;">
-            <h2 class="mt-4 mb-3">Team Rankings</h2>
+            <div class="d-flex justify-content-between align-items-center mt-4 mb-3">
+                <h2>Team Rankings</h2>
+                <button class="btn btn-primary" onclick="openColumnSelector()">
+                    Toggle Columns
+                </button>
+            </div>
             <div class="card">
                 <div class="card-body">
                     <div class="table-responsive">
                         <table class="table table-dark table-striped table-hover">
-                            <thead>
+                            <thead id="teamTableHead">
                                 <tr>
                                     <th>Rank</th>
                                     <th>Team</th>
@@ -122,10 +130,30 @@
                             <tbody id="teamTableBody"></tbody>
                         </table>
                     </div>
+                    <p class="text-muted mt-2 mb-0">
+                        <small>Click any column header to sort. Click a team row to view details.</small>
+                    </p>
                 </div>
             </div>
         </div>
     </div>
+    <div id="columnSelectorModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Select Columns to Display</h3>
+                <span class="close" onclick="closeColumnSelector()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p class="mb-3">Choose what fields to Display:</p>
+                <div id="columnCheckboxes" class="column-grid"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeColumnSelector()">Cancel</button>
+                <button class="btn btn-primary" onclick="applyColumnSelection()">Apply</button>
+            </div>
+        </div>
+    </div>
+
     <script src="/js/loadData.js"></script>
     <script src="/js/data.js"></script>
 </body>

@@ -1,4 +1,24 @@
 let charts = {};
+let currentSortColumn = 'avgTotalCoral';
+let currentSortDirection = 'desc';
+let selectedColumns = ['avgTotalCoral', 'avgTotalAlgae', 'climbRate', 'avgOffense', 'avgDefense'];
+
+// TODO: Auto update columns based on available data
+const availableColumns = {
+    'avgTotalCoral': { label: 'Avg Coral', format: (val) => val.toFixed(1) },
+    'avgAutoCoral': { label: 'Avg Auto Coral', format: (val) => val.toFixed(1) },
+    'avgTeleCoral': { label: 'Avg Tele Coral', format: (val) => val.toFixed(1) },
+    'avgTotalAlgae': { label: 'Avg Algae', format: (val) => val.toFixed(1) },
+    'avgAutoAlgae': { label: 'Avg Auto Algae', format: (val) => val.toFixed(1) },
+    'avgTeleAlgae': { label: 'Avg Tele Algae', format: (val) => val.toFixed(1) },
+    'climbRate': { label: 'Climb %', format: (val) => val.toFixed(0) + '%' },
+    'avgOffense': { label: 'Offense', format: (val) => val.toFixed(1) },
+    'avgDefense': { label: 'Defense', format: (val) => val.toFixed(1) },
+    'avgTeleopScore': { label: 'Avg Teleop Score', format: (val) => val.toFixed(1) },
+    'avgAutoScore': { label: 'Avg Auto Score', format: (val) => val.toFixed(1) },
+    'avgTotalScore': { label: 'Avg Total Score', format: (val) => val.toFixed(1) },
+    'matches': { label: 'Matches', format: (val) => val }
+};
 
 function toggleLoader() {
     const card = document.getElementById('loaderCard');
@@ -38,22 +58,111 @@ function updateTeamData() {
     document.getElementById('chartsSection').style.display = 'block';
 }
 
+function openColumnSelector() {
+    const modal = document.getElementById('columnSelectorModal');
+    const checkboxContainer = document.getElementById('columnCheckboxes');
+    checkboxContainer.innerHTML = '';
+    Object.keys(availableColumns).forEach(key => {
+        const isChecked = selectedColumns.includes(key);
+        const checkbox = `
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="${key}" 
+                       id="col_${key}" ${isChecked ? 'checked' : ''}>
+                <label class="form-check-label" for="col_${key}">
+                    ${availableColumns[key].label}
+                </label>
+            </div>
+        `;
+        checkboxContainer.innerHTML += checkbox;
+    });
+    
+    modal.style.display = 'block';
+}
+
+function closeColumnSelector() {
+    document.getElementById('columnSelectorModal').style.display = 'none';
+}
+
+function applyColumnSelection() {
+    const checkboxes = document.querySelectorAll('#columnCheckboxes input[type="checkbox"]');
+    selectedColumns = Array.from(checkboxes)
+        .filter(cb => cb.checked)
+        .map(cb => cb.value);
+    
+    if (selectedColumns.length === 0) {
+        alert('Please select at least one column');
+        return;
+    }
+    
+    closeColumnSelector();
+    displayTeamTable();
+}
+
+function sortTable(column) {
+    if (currentSortColumn === column) {
+        currentSortDirection = currentSortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+        currentSortColumn = column;
+        currentSortDirection = 'desc';
+    }
+    displayTeamTable();
+}
+
 function displayTeamTable() {
     const teamData = aggregateByTeam();
-    const sorted = Object.entries(teamData).sort((a, b) => 
-        (b[1].avgTotalCoral) - (a[1].avgTotalCoral)
-    );
+    
+    // TODO: Calculate average scores and other derived metrics automatically instead of in browser
+    Object.keys(teamData).forEach(team => {
+        teamData[team].avgTotalScore = teamData[team].avgTeleopScore + teamData[team].avgAutoScore;
+        teamData[team].avgAutoAlgae = teamData[team].totalAutoAlgae / teamData[team].matches;
+        teamData[team].avgTeleAlgae = teamData[team].totalTeleAlgae / teamData[team].matches;
+    });
+    
+    const sorted = Object.entries(teamData).sort((a, b) => {
+        const aVal = a[1][currentSortColumn] || 0;
+        const bVal = b[1][currentSortColumn] || 0;
+        
+        if (currentSortDirection === 'asc') {
+            return aVal - bVal;
+        } else {
+            return bVal - aVal;
+        }
+    });
 
+    const thead = document.getElementById('teamTableHead');
+    const getSortIcon = (col) => {
+        if (currentSortColumn !== col) return '↑↓';
+        return currentSortDirection === 'asc' ? '↑' : '↓';
+    };
+    
+    thead.innerHTML = `
+        <tr>
+            <th onclick="sortTable('rank')" style="cursor: pointer;">
+                Rank ${getSortIcon('rank')}
+            </th>
+            <th onclick="sortTable('teamNumber')" style="cursor: pointer;">
+                Team ${getSortIcon('teamNumber')}
+            </th>
+            ${selectedColumns.map(col => `
+                <th onclick="sortTable('${col}')" style="cursor: pointer;">
+                    ${availableColumns[col].label} ${getSortIcon(col)}
+                </th>
+            `).join('')}
+            <th onclick="sortTable('matches')" style="cursor: pointer;">
+                Matches ${getSortIcon('matches')}
+            </th>
+        </tr>
+    `;
+
+    // Build table body
     const tbody = document.getElementById('teamTableBody');
     tbody.innerHTML = sorted.map(([team, stats], index) => `
         <tr class="team-row" onclick="selectTeamFromTable('${team}')">
             <td>${index + 1}</td>
             <td>${team}</td>
-            <td>${stats.avgTotalCoral.toFixed(1)}</td>
-            <td>${stats.avgTotalAlgae.toFixed(1)}</td>
-            <td>${stats.climbRate.toFixed(0)}%</td>
-            <td>${stats.avgOffense.toFixed(1)}</td>
-            <td>${stats.avgDefense.toFixed(1)}</td>
+            ${selectedColumns.map(col => `
+                <td>${availableColumns[col].format(stats[col] || 0)}</td>
+            `).join('')}
             <td>${stats.matches}</td>
         </tr>
     `).join('');
@@ -71,6 +180,8 @@ function showTeamDetail(teamNumber) {
     
     document.getElementById('detailTeamNumber').textContent = teamNumber;
     
+
+    // TODO: Make Auto/Teleop scores not game specific
     const html = `
         <div class="row mb-4">
             <div class="col-md-3">
@@ -98,7 +209,7 @@ function showTeamDetail(teamNumber) {
                 </div>
             </div>
         </div>
-        <h4>Match History</h4>
+        <h4 class="mb-0">Match History</h4>
         <div class="table-responsive">
             <table class="table table-dark table-sm">
                 <thead>
@@ -268,30 +379,25 @@ function createRadarChart() {
     const allTeamData = aggregateByTeam();
     const thisTeam = allTeamData[selectedTeam];
     
-    const allOffenseRatings = Object.values(allTeamData).map(t => t.avgOffense).sort((a, b) => a - b);
-    const allDefenseRatings = Object.values(allTeamData).map(t => t.avgDefense).sort((a, b) => a - b);
-    
-    const avgStats = {
-        avgDefense: getPercentile(thisTeam.avgDefense, allDefenseRatings),
-        avgOffense: getPercentile(thisTeam.avgOffense, allOffenseRatings),
-        avgTeleopScore: thisTeam.avgTeleCoral,
-        avgAutoScore: thisTeam.avgAutoCoral,
-        avgEndgame: thisTeam.climbRate
-    };
+    // TODO: Calculate in server and save to database instead of in browser
+    const allOffense = Object.values(allTeamData).map(t => t.avgOffense).sort((a, b) => a - b);
+    const allDefense = Object.values(allTeamData).map(t => t.avgDefense).sort((a, b) => a - b);
+    const allTeleop = Object.values(allTeamData).map(t => t.avgTeleCoral).sort((a, b) => a - b);
+    const allAuto = Object.values(allTeamData).map(t => t.avgAutoCoral).sort((a, b) => a - b);
+    const allClimb = Object.values(allTeamData).map(t => t.climbRate).sort((a, b) => a - b);
 
-    // TODO: Make replace subjective rankings with DPR and OPR
     charts.radar = new Chart(document.getElementById('radarChart'), {
         type: 'radar',
         data: {
-            labels: ['Defense Subjective', 'Offense Subjective', 'Avg Teleop Score', 'Avg Auto Score', 'Endgame %'],
+            labels: ['Defense', 'Offense', 'Teleop Coral', 'Auto Coral', 'Climb Rate'],
             datasets: [{
-                label: 'Team Performance',
+                label: 'Team Percentile',
                 data: [
-                    avgStats.avgDefense,
-                    avgStats.avgOffense,
-                    avgStats.avgTeleopScore,
-                    avgStats.avgAutoScore,
-                    avgStats.avgEndgame / 10
+                    getPercentile(thisTeam.avgDefense, allDefense),
+                    getPercentile(thisTeam.avgOffense, allOffense),
+                    getPercentile(thisTeam.avgTeleCoral, allTeleop),
+                    getPercentile(thisTeam.avgAutoCoral, allAuto),
+                    getPercentile(thisTeam.climbRate, allClimb)
                 ],
                 backgroundColor: 'rgba(255, 240, 31, 0.2)',
                 borderColor: '#FFF01F',
@@ -307,22 +413,28 @@ function createRadarChart() {
             scales: {
                 r: {
                     beginAtZero: true,
-                    suggestedMax: 10,
-                    suggestedMin: 0,
+                    max: 10,
                     ticks: {
-                        display: false
+                        stepSize: 2,
+                        display: true
                     },
                     pointLabels: {
                         font: {
                             size: 14 
                         }
-                    },
-                    padding: 10
+                    }
                 }
             },
             plugins: {
                 legend: {
-                    display: false
+                    display: true
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `Percentile: ${context.parsed.r.toFixed(1)}/10`;
+                        }
+                    }
                 }
             }
         }
@@ -333,6 +445,11 @@ function renderPenaltyTable() {
     const penaltyMatches = getPenaltyMatches(selectedTeam);
     const tbody = document.getElementById('penaltyTableBody');
     
+    if (penaltyMatches.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="3" class="text-center">No penalties recorded</td></tr>';
+        return;
+    }
+    
     tbody.innerHTML = penaltyMatches.map(p => `
         <tr>
             <td>${p.match}</td>
@@ -340,4 +457,11 @@ function renderPenaltyTable() {
             <td>${p.penalty}</td>
         </tr>
     `).join('');
+}
+
+window.onclick = function(event) {
+    const modal = document.getElementById('columnSelectorModal');
+    if (event.target === modal) {
+        closeColumnSelector();
+    }
 }
