@@ -76,8 +76,6 @@ app.post('/submit-form', (req, res) => {
   sheet.addRow(formData);
 })
 
-// TODO: use axios
-
 app.get('/get-api-data', (req, res) => {
   const formData = req.get("url")
   const url = `https://www.thebluealliance.com/api/v3/` + formData;
