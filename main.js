@@ -4,7 +4,8 @@ var XMLHttpRequest = require('xmlhttprequest').XMLHttpRequest;
 const axios = require('axios')
 
 const express = require('express')
-const googleSpreadSheet = require('google-spreadsheet');
+const cors = require('cors')
+const googleSpreadSheet =  require('google-spreadsheet');
 const googleAuth = require('google-auth-library');
 var sheet;
 
@@ -33,6 +34,7 @@ const port = 3000
 
 app.use(express.static('src'))
 app.use(express.json())
+app.use(cors())
 
 app.get('/', (req, res) => {
   res.sendFile('src/index.html', { root: __dirname })
