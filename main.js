@@ -1,9 +1,15 @@
 require('dotenv').config()
+
+var XMLHttpRequest = require('xmlhttprequest').XMLHttpRequest;
+const axios = require('axios')
+
 const express = require('express')
 const cors = require('cors')
 const googleSpreadSheet =  require('google-spreadsheet');
 const googleAuth = require('google-auth-library');
 var sheet;
+
+const fetch = require('node-fetch')
 
 // Initialize auth - see https://theoephraim.github.io/node-google-spreadsheet/#/guides/authentication
 const serviceAccountAuth = new googleAuth.JWT({
@@ -31,18 +37,18 @@ app.use(express.json())
 app.use(cors())
 
 app.get('/', (req, res) => {
-    res.sendFile('src/index.html', {root: __dirname })
+  res.sendFile('src/index.html', { root: __dirname })
 })
 
 app.get('/data', (req, res) => {
-    res.sendFile('src/data.html', {root: __dirname })
+  res.sendFile('src/data.html', { root: __dirname })
 })
 
 app.get('/get-data', async (req, res) => {
   try {
     await sheet.loadCells();
     const rows = await sheet.getRows();
-    
+
     const data = rows.map(row => {
       const rowData = {};
       sheet.headerValues.forEach(header => {
@@ -68,10 +74,22 @@ app.get('/get-data', async (req, res) => {
 app.post('/submit-form', (req, res) => {
   const formData = req.body;
   console.log('Form Data Received:', formData);
-  
+
   sheet.addRow(formData);
 })
 
+app.get('/get-api-data', (req, res) => {
+  const formData = req.get("url")
+  const url = `https://www.thebluealliance.com/api/v3/` + formData;
+  axios.get(url, {
+    headers: {
+      "X-TBA-Auth-Key": process.env.tba_auth
+    }
+  }).then(response => {
+    res.json(response.data);
+  });
+})
+
 app.listen(port, () => {
-    console.log(`Server running on http://localhost:${port}`)
+  console.log(`Server running on http://localhost:${port}`)
 })
