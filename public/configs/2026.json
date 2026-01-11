@@ -1,0 +1,140 @@
+{
+    "$schema": "./schema.json",
+    "title": "QRScout",
+    "page_title": "REBUILT",
+    "sections": [
+        {
+            "name": "Autonomous",
+            "fields": [
+                {
+                    "code": "AutoFuelScore",
+                    "title": "Fuel Scored",
+                    "type": "spinbox",
+                    "defaultValue": 0,
+                    "min": 0,
+                    "required": false
+                },
+                {
+                    "code": "AutoTowerL1",
+                    "title": "Tower Level 1",
+                    "type": "checkbox",
+                    "defaultValue": false,
+                    "required": false
+                },
+                {
+                    "code": "AutoLeaveStarting",
+                    "title": "Left Starting Line",
+                    "type": "checkbox",
+                    "defaultValue": false,
+                    "required": false
+                }
+            ]
+        },
+        {
+            "name": "Teleop",
+            "fields": [
+                {
+                    "code": "TeleFuelScore",
+                    "title": "Fuel Scored",
+                    "type": "spinbox",
+                    "defaultValue": 0,
+                    "min": 0,
+                    "required": false
+                }
+            ]
+        },
+        {
+            "name": "Endgame",
+            "fields": [
+                {
+                    "title": "Tower Level",
+                    "type": "select",
+                    "required": true,
+                    "code": "TowerLevel",
+                    "choices": {
+                        "None": "No Climb",
+                        "L1": "Level 1",
+                        "L2": "Level 2",
+                        "L3": "Level 3"
+                    },
+                    "defaultValue": "None"
+                },
+                {
+                    "title": "Fuel Pickup Locations",
+                    "type": "select",
+                    "required": true,
+                    "code": "FuelPickup",
+                    "choices": {
+                        "N": "None",
+                        "D": "Ground Only",
+                        "C": "Chute Only",
+                        "B": "Both"
+                    },
+                    "defaultValue": "None"
+                }
+            ]
+        },
+        {
+            "name": "Postmatch",
+            "fields": [
+                {
+                    "code": "Fouls",
+                    "title": "Fouls",
+                    "type": "spinbox",
+                    "defaultValue": 0,
+                    "required": false
+                },
+                {
+                    "code": "Died",
+                    "title": "Died/Disabled",
+                    "type": "checkbox",
+                    "defaultValue": false,
+                    "required": false
+                },
+                {
+                    "code": "Tipped",
+                    "title": "Tipped Over",
+                    "type": "checkbox",
+                    "defaultValue": false,
+                    "required": false
+                },
+                {
+                    "code": "YRCard",
+                    "title": "Yellow/Red Card",
+                    "type": "checkbox",
+                    "defaultValue": false,
+                    "required": false
+                },
+                {
+                    "title": "Offense Skill",
+                    "type": "range",
+                    "required": false,
+                    "code": "offskillrate",
+                    "defaultValue": 4,
+                    "min": 1,
+                    "max": 7,
+                    "step": 1
+                },
+                {
+                    "title": "Defense Skill",
+                    "type": "range",
+                    "required": false,
+                    "code": "defskillrate",
+                    "defaultValue": 4,
+                    "min": 1,
+                    "max": 7,
+                    "step": 1
+                },
+                {
+                    "code": "comments",
+                    "title": "Comments",
+                    "type": "text",
+                    "min": 0,
+                    "max": 50,
+                    "required": false,
+                    "defaultValue": ""
+                }
+            ]
+        }
+    ]
+}
