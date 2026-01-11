@@ -1,7 +1,7 @@
 let charts = {};
 let currentSortColumn = 'avgTotalCoral';
 let currentSortDirection = 'desc';
-let selectedColumns = ['avgTotalCoral', 'avgTotalAlgae', 'climbRate', 'avgOffense', 'avgDefense'];
+let selectedColumns = ['avgTotalScore', 'avgAutoScore', 'climbRate', 'avgOffense', 'avgDefense'];
 
 // TODO: Auto update columns based on available data
 const availableColumns = {
