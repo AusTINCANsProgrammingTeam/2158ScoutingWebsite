@@ -1,54 +1,118 @@
-var configFileName = "2025.json";
+var configFileName = "2026.json";
 var form = document.getElementsByClassName("formBody")[0];
+
+let currentConfigVersion = "2026.json";
+
+document
+  .getElementById("loadConfigBtn")
+  .addEventListener("click", function (e) {
+    e.preventDefault();
+    const selectedConfig = document.getElementById("configSelect").value;
+    configFileName = selectedConfig;
+    currentConfigVersion = selectedConfig;
+    form.innerHTML = "";
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    websiteBuilder()
+  });
+
+document
+  .getElementById("configSelect")
+  .addEventListener("change", function (e) {
+    document.getElementById('loadConfigBtn').click();
+  });
+
+document.addEventListener("DOMContentLoaded", function () {
+  const selectedConfig = document.getElementById("configSelect").value;
+  configFileName = selectedConfig;
+  currentConfigVersion = selectedConfig;
+});
 
 // Prematch
 const prematchConfig = {
   name: "Prematch",
   preserveDataOnReset: true,
   fields: [
-    { title: "Scouter Name", type: "text", required: true, code: "scouter", defaultValue: "" },
-    { title: "Match Number", type: "number", required: true, code: "matchNumber", defaultValue: "0" },
     {
-      title: "Robot", type: "select", required: true,
-      code: "robot",
-      choices: { R1: "Red 1", R2: "Red 2", R3: "Red 3", B1: "Blue 1", B2: "Blue 2", B3: "Blue 3" },
-      defaultValue: "R1"
+      title: "Scouter Name",
+      type: "text",
+      required: true,
+      code: "scouter",
+      defaultValue: "",
     },
-    { title: "Team Number", type: "number", required: true, code: "teamNumber", defaultValue: "0" },
+    {
+      title: "Match Number",
+      type: "number",
+      required: true,
+      code: "matchNumber",
+      defaultValue: "0",
+    },
+    {
+      title: "Robot",
+      type: "select",
+      required: true,
+      code: "robot",
+      choices: {
+        R1: "Red 1",
+        R2: "Red 2",
+        R3: "Red 3",
+        B1: "Blue 1",
+        B2: "Blue 2",
+        B3: "Blue 3",
+      },
+      defaultValue: "R1",
+    },
+    {
+      title: "Team Number",
+      type: "number",
+      required: true,
+      code: "teamNumber",
+      defaultValue: "0",
+    },
     { title: "No Show", type: "checkbox", code: "noShow", defaultValue: false },
-    { title: "Starting Position", type: "clickImg", required: true, imgRed: "../img/field_2025_red.png", imgBlue: "../img/field_2025_blue.png", code: "startingPosition", defaultValue: "" }
-  ]
+    {
+      title: "Starting Position",
+      type: "clickImg",
+      required: true,
+      imgRed: "../img/field_2025_red.png",
+      imgBlue: "../img/field_2025_blue.png",
+      code: "startingPosition",
+      defaultValue: "",
+    },
+  ],
 };
 
 // Form Variables
-var startingPosition = (0,0)
+var startingPosition = (0, 0);
 
 /*
- *  Init 
+ *  Init
  */
 async function websiteBuilder() {
-  const response = await fetch('../configs/' + configFileName);
+  const response = await fetch("../configs/" + configFileName);
   const data = await response.json();
 
   renderSection("Prematch", prematchConfig.fields);
   renderConfigSections(data.sections);
 }
 
-document.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener("DOMContentLoaded", async () => {
   await websiteBuilder();
   addFormButtons();
 });
 
 /*
-* Render Functions
-*/
+ * Render Functions
+ */
 function renderConfigSections(sections) {
   form.onsubmit = submitFunction;
-  sections.forEach(section => renderSection(section.name, section.fields));
+  sections.forEach((section) => renderSection(section.name, section.fields));
 }
 
 function renderSection(name, fields) {
-  const sectionDiv = createElement("div", "row center clearfix border-bottom content-style1");
+  const sectionDiv = createElement(
+    "div",
+    "row center clearfix border-bottom content-style1"
+  );
 
   const title = createElement("h4", "text-primary");
   title.innerText = name;
@@ -58,7 +122,7 @@ function renderSection(name, fields) {
   const fieldContainer = createElement("div", "col-auto");
   sectionDiv.appendChild(fieldContainer);
 
-  fields.forEach(field => {
+  fields.forEach((field) => {
     fieldContainer.appendChild(renderField(field));
   });
 
@@ -75,14 +139,14 @@ function renderField(field) {
     range: createRangeBox,
     select: createSelectBox,
     spinbox: createSpinBox,
-    clickImg: createClickImage
+    clickImg: createClickImage,
   };
 
   return factories[type](field);
 }
 
 /*
- *  Factory Functions 
+ *  Factory Functions
  */
 function createTextBox({ code, title, defaultValue, required }) {
   const el = wrapper();
@@ -124,11 +188,22 @@ function createCheckBox({ code, title, defaultValue, required }) {
   return el;
 }
 
-function createSpinBox({ code, title, min = 0, max = 10, step = 1, defaultValue = 0, required }) {
+function createSpinBox({
+  code,
+  title,
+  min = 0,
+  max = 10,
+  step = 1,
+  defaultValue = 0,
+  required,
+}) {
   const el = wrapper();
   el.appendChild(labelFor(code, title));
 
-  const spinBox = createElement("div", "input-group spinbox-group flex-nowrap center");
+  const spinBox = createElement(
+    "div",
+    "input-group spinbox-group flex-nowrap center"
+  );
 
   const decrement = button("-", () => changeSpin(code, -step, min, max));
   const increment = button("+", () => changeSpin(code, step, min, max));
@@ -144,16 +219,23 @@ function createSpinBox({ code, title, min = 0, max = 10, step = 1, defaultValue 
   return el;
 }
 
-function createClickImage({ code, title, imgRed, imgBlue, defaultValue, required }) {
+function createClickImage({
+  code,
+  title,
+  imgRed,
+  imgBlue,
+  defaultValue,
+  required,
+}) {
   const el = wrapper();
   el.appendChild(labelFor(code, title));
-  el.classList = "center"
+  el.classList = "center";
 
   const canvas = document.createElement("canvas");
-  canvas.classList = "center"
+  canvas.classList = "center";
   canvas.id = code;
   canvas.style.cursor = "crosshair";
-  canvas.width  = window.innerWidth;
+  canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
   el.appendChild(canvas);
 
@@ -162,26 +244,25 @@ function createClickImage({ code, title, imgRed, imgBlue, defaultValue, required
   const img = new Image();
   img.src = imgRed;
 
-
   let currentImage = new Image();
   currentImage.src = imgRed;
   currentImage.onload = () => drawImage();
   // Due to selection element not being rendered yet
   setTimeout(() => {
-    var selectedRobot = document.getElementById("robot")
+    var selectedRobot = document.getElementById("robot");
     selectedRobot.addEventListener("change", function () {
-      if (this.value.charAt(0) == 'B') {
-        currentImage.src =imgBlue
+      if (this.value.charAt(0) == "B") {
+        currentImage.src = imgBlue;
       } else {
-        currentImage.src = imgRed
+        currentImage.src = imgRed;
       }
-      console.log(currentImage.src)
+      console.log(currentImage.src);
       currentImage.onload = () => {
         startingPosition = null;
         drawImage();
       };
-    })
-  }, 1000)
+    });
+  }, 1000);
 
   canvas.addEventListener("click", function (event) {
     const rect = canvas.getBoundingClientRect();
@@ -207,20 +288,28 @@ function createClickImage({ code, title, imgRed, imgBlue, defaultValue, required
   }
 
   function drawMarker(x, y) {
-    radius = 32
-    if (currentImage.src == imgBlue){
+    radius = 32;
+    if (currentImage.src == imgBlue) {
       ctx.fillStyle = "blue";
     } else {
       ctx.fillStyle = "red";
     }
     ctx.beginPath();
-    ctx.rect(x-radius/2, y-radius/2, radius, radius);
+    ctx.rect(x - radius / 2, y - radius / 2, radius, radius);
     ctx.fill();
   }
   return el;
 }
 
-function createRangeBox({ code, title, min = 0, max = 10, step = 1, defaultValue = null, required }) {
+function createRangeBox({
+  code,
+  title,
+  min = 0,
+  max = 10,
+  step = 1,
+  defaultValue = null,
+  required,
+}) {
   const el = wrapper();
   el.appendChild(labelFor(code, title));
 
@@ -249,7 +338,7 @@ function createSelectBox({ code, title, choices, defaultValue, required }) {
   select.id = code;
   select.name = code;
   select.dataset.default = defaultValue;
-  select.required = required
+  select.required = required;
 
   for (let key in choices) {
     const option = document.createElement("option");
@@ -264,18 +353,18 @@ function createSelectBox({ code, title, choices, defaultValue, required }) {
 }
 
 /*
-* Form Functions
-*/
+ * Form Functions
+ */
 function submitFunction(e) {
   e.preventDefault();
-  const data = new FormData(e.target).entries()
-  const formData = Object.fromEntries(data)
-  formData.startingPos = `${startingPosition.x}, ${startingPosition.y}`
- 
-  fetch('/submit-form', {
-    method: 'POST',
+  const data = new FormData(e.target).entries();
+  const formData = Object.fromEntries(data);
+  formData.startingPos = `${startingPosition.x}, ${startingPosition.y}`;
+
+  fetch("/submit-form", {
+    method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(formData)
+    body: JSON.stringify(formData),
   });
 }
 
@@ -310,7 +399,7 @@ function resetFunction(e) {
 }
 
 /*
- *  Element Constructors 
+ *  Element Constructors
  */
 function wrapper() {
   return createElement("div");
@@ -328,7 +417,7 @@ function inputBase(type, id, value, required) {
   input.type = type;
   input.id = id;
   input.name = id;
-  input.classList = "form-control"
+  input.classList = "form-control";
   input.value = value;
   input.dataset.default = value;
   input.required = required;
@@ -358,23 +447,34 @@ function createElement(tag, classList = "") {
 
 function addFormButtons() {
   const submitDiv = createElement("div", "row mt-3 mb-3");
-  const submit = createElement("input", "btn btn-primary d-block mt-2 center content-style1");
+  const submit = createElement(
+    "input",
+    "btn btn-primary d-block mt-2 center content-style1"
+  );
   submit.type = "submit";
   submitDiv.appendChild(submit);
 
   const resetDiv = createElement("div");
-  const reset = createElement("input", "btn btn-secondary d-block mt-2 center content-style1");
+  const reset = createElement(
+    "input",
+    "btn btn-secondary d-block mt-2 center content-style1"
+  );
   reset.type = "reset";
   reset.onclick = resetFunction;
   resetDiv.appendChild(reset);
 
-  const getKeys = createElement("input", "btn btn-secondary d-block mt-2 center content-style1");
+  const getKeys = createElement(
+    "input",
+    "btn btn-secondary d-block mt-2 center content-style1"
+  );
   getKeys.type = "button";
   getKeys.value = "Get Form Keys";
   getKeys.onclick = () => {
     const formData = new FormData(form);
-    const formKeys = Object.keys(Object.fromEntries(formData.entries()))
-    formKeys.push("startingPos")
+    const formKeys = Object.keys(Object.fromEntries(formData.entries()));
+    formData.configVersion = currentConfigVersion;
+    formKeys.push("startingPos");
+    formKeys.push("configVer");
     console.log(formKeys.join(", "));
   };
 

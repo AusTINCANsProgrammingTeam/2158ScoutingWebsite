@@ -1,10 +1,10 @@
 @import "../../node_modules/bootstrap/scss/functions";
 
-$primary: #FFF01F;
-$form-label-color: #CCBE00;
+$primary: #fff01f;
+$form-label-color: #ccbe00;
 $primary-bg-color: #010101;
-$secondary: #1F1F1F;
-$label-color: #CCBE00;
+$secondary: #1f1f1f;
+$label-color: #ccbe00;
 $bg-color: #010101;
 $card-bg: #1a1a1a;
 $card-bg-light: #2a2a2a;
@@ -111,7 +111,6 @@ table {
   margin-bottom: 30px;
 }
 
-
 input[type="range"] {
   -webkit-appearance: none;
   appearance: none;
@@ -149,4 +148,76 @@ input[type="range"] {
     border-radius: 50%;
     border: 2px solid $label-color;
   }
+}
+
+.config-selector-container {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  padding: 12px 15px;
+  background-color: #fff;
+  border-bottom: 2px solid #dee2e6;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.config-selector {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+  width: 100%;
+}
+.config-selector label {
+  margin: 0;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  white-space: nowrap;
+}
+.config-selector select {
+  flex: 1;
+  min-height: 38px;
+  font-size: 14px;
+}
+.config-selector button {
+  min-height: 38px;
+  padding: 0 16px;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+@media (max-width: 480px) {
+  .config-selector-container {
+    padding: 10px 10px;
+  }
+  .config-selector {
+    flex-direction: column;
+    gap: 6px;
+  }
+  .config-selector label {
+    font-size: 13px;
+  }
+  .config-selector select,
+  .config-selector button {
+    width: 100%;
+    min-height: 40px;
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 360px) {
+  .config-selector-container {
+    padding: 8px;
+  }
+  .config-selector label {
+    font-size: 12px;
+  }
+}
+
+body {
+  overflow-x: hidden;
+}
+
+.formBody {
+  padding: 0 10px;
 }
