@@ -8,6 +8,10 @@
     ],
     "rewrites": [
       {
+        "source": "/data",
+        "destination": "/data.html"
+      },
+      {
         "source": "/submit-form",
         "function": "api"
       },
@@ -23,6 +27,6 @@
   },
   "functions": {
     "source": "functions",
-    "runtime": "nodejs24"
+    "runtime": "nodejs18"
   }
 }
