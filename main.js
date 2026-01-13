@@ -3,6 +3,7 @@ require('dotenv').config()
 var XMLHttpRequest = require('xmlhttprequest').XMLHttpRequest;
 const axios = require('axios')
 
+const functions = require("firebase-functions");
 const express = require('express')
 const cors = require('cors')
 const googleSpreadSheet =  require('google-spreadsheet');
@@ -32,16 +33,16 @@ load();
 const app = express()
 const port = 3000
 
-app.use(express.static('src'))
+app.use(express.static('public'))
 app.use(express.json())
 app.use(cors())
 
 app.get('/', (req, res) => {
-  res.sendFile('src/index.html', { root: __dirname })
+  res.sendFile('public/index.html', { root: __dirname })
 })
 
 app.get('/data', (req, res) => {
-  res.sendFile('src/data.html', { root: __dirname })
+  res.sendFile('public/data.html', { root: __dirname })
 })
 
 app.get('/get-data', async (req, res) => {
@@ -93,3 +94,5 @@ app.get('/get-api-data', (req, res) => {
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`)
 })
+
+exports.api = functions.https.onRequest(app);
