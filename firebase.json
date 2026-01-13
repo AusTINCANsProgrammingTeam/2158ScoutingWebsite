@@ -8,9 +8,21 @@
     ],
     "rewrites": [
       {
-        "source": "**",
+        "source": "/submit-form",
+        "function": "api"
+      },
+      {
+        "source": "/get-data",
+        "function": "api"
+      },
+      {
+        "source": "/get-api-data",
         "function": "api"
       }
     ]
+  },
+  "functions": {
+    "source": "functions",
+    "runtime": "nodejs24"
   }
 }
