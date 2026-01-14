@@ -361,7 +361,7 @@ function submitFunction(e) {
   const formData = Object.fromEntries(data);
   formData.startingPos = `${startingPosition.x}, ${startingPosition.y}`;
 
-  fetch("/submit-form", {
+  fetch(apiUrl + "/submit-form", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(formData),

@@ -1,5 +1,6 @@
 let scoutingData = [];
 let selectedTeam = null;
+var apiUrl = "https://api-2sv4ordija-uc.a.run.app";
 
 document.addEventListener('DOMContentLoaded', () => {
     loadDataFromServer();
@@ -12,7 +13,7 @@ async function loadDataFromServer() {
         statusEl.textContent = 'Loading data from Google Sheets...';
         statusEl.className = 'mb-2 text-muted';
         
-        const response = await fetch('/get-data');
+        const response = await fetch(apiUrl + '/get-data');
         const data = await response.json();
         
         if (data.success && data.rows.length > 0) {
