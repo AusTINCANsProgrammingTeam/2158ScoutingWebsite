@@ -1,3 +1,4 @@
+var apiUrl = "https://api-2sv4ordija-uc.a.run.app";
 var configFileName = "2026.json";
 var form = document.getElementsByClassName("formBody")[0];
 
@@ -93,11 +94,11 @@ async function websiteBuilder() {
 
   renderSection("Prematch", prematchConfig.fields);
   renderConfigSections(data.sections);
+  addFormButtons();
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
-  await websiteBuilder();
-  addFormButtons();
+  websiteBuilder()
 });
 
 /*

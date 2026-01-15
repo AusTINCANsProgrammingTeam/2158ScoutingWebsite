@@ -1,14 +1,16 @@
 const { onRequest } = require("firebase-functions/v2/https");
+const { getDatabase } = require("firebase-admin/database");
+const admin = require("firebase-admin");
 const { defineSecret } = require('firebase-functions/params');
 const express = require('express');
 const cors = require('cors');
-const { GoogleSpreadsheet } = require('google-spreadsheet');
-const { JWT } = require('google-auth-library');
 const axios = require('axios');
 
-// Define secrets
-const googleServiceAccountEmail = defineSecret('GOOGLE_SERVICE_ACCOUNT_EMAIL');
-const googlePrivateKey = defineSecret('GOOGLE_PRIVATE_KEY');
+if (!admin.apps.length) {
+  admin.initializeApp();
+}
+
+// Secrets are from google cloud secret manager
 const tbaAuthKey = defineSecret('TBA_AUTH_KEY');
 
 const app = express();
@@ -17,57 +19,42 @@ const app = express();
 app.use(cors({ origin: true }));
 app.use(express.json());
 
-// Initialize Google Sheets auth (will be set up in the route handlers)
-let serviceAccountAuth;
-function getAuth() {
-  if (!serviceAccountAuth) {
-    serviceAccountAuth = new JWT({
-      email: googleServiceAccountEmail.value(),
-      key: googlePrivateKey.value().replace(/\\n/g, '\n'),
-      scopes: ['https://www.googleapis.com/auth/spreadsheets'],
-    });
-  }
-  return serviceAccountAuth;
-}
-
-const spreadsheetID = "1hcPBLxfMX96H9hnk4zUM-RcUNW2Z7F41BXxGBHHbvHE";
-let sheet;
-
-// Initialize sheet
-async function initSheet() {
-  if (!sheet) {
-    const doc = new GoogleSpreadsheet(spreadsheetID, getAuth());
-    await doc.loadInfo();
-    sheet = doc.sheetsById[1209408590];
-  }
-  return sheet;
+// Get database reference
+function getDbRef() {
+  const db = getDatabase();
+  return db.ref('s  couting-data');
 }
 
 // Routes
 app.get('/get-data', async (req, res) => {
   try {
-    const currentSheet = await initSheet();
-    await currentSheet.loadCells();
-    const rows = await currentSheet.getRows();
+    const dbRef = getDbRef();
+    const snapshot = await dbRef.once('value');
+    const data = snapshot.val();
 
-    const data = rows.map(row => {
-      const rowData = {};
-      currentSheet.headerValues.forEach(header => {
-        rowData[header] = row.get(header) || '';
+    if (!data) {
+      return res.json({
+        success: true,
+        rows: [],
+        count: 0
       });
-      return rowData;
-    });
+    }
+
+    const rows = Object.keys(data).map(key => ({
+      id: key,
+      ...data[key]
+    }));
 
     res.json({
       success: true,
-      rows: data,
-      count: data.length
+      rows: rows,
+      count: rows.length
     });
   } catch (error) {
     console.error('Error fetching data:', error);
     res.status(500).json({
       success: false,
-      error: 'Failed to fetch data from spreadsheet'
+      error: 'Failed to fetch data from database'
     });
   }
 });
@@ -77,18 +64,25 @@ app.post('/submit-form', async (req, res) => {
     const formData = req.body;
     console.log('Form Data Received:', formData);
 
-    const currentSheet = await initSheet();
-    await currentSheet.addRow(formData);
+    const dbRef = getDbRef();
+    
+    const dataToSave = {
+      ...formData,
+      timestamp: admin.database.ServerValue.TIMESTAMP
+    };
+
+    const newRef = await dbRef.push(dataToSave);
 
     res.json({
       success: true,
-      message: 'Data submitted successfully'
+      message: 'Data submitted successfully',
+      id: newRef.key
     });
   } catch (error) {
     console.error('Error submitting form:', error);
     res.status(500).json({
       success: false,
-      error: 'Failed to submit data'
+      error: 'Failed to submit data: ' + error
     });
   }
 });
@@ -114,10 +108,9 @@ app.get('/get-api-data', async (req, res) => {
   }
 });
 
-// Export the Express app as a Firebase Function with secrets
 exports.api = onRequest(
   {
-    secrets: [googleServiceAccountEmail, googlePrivateKey, tbaAuthKey],
+    secrets: [tbaAuthKey],
     cors: true
   },
   app
