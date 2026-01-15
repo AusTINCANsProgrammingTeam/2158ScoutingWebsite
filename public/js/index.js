@@ -241,26 +241,27 @@ function createClickImage({
 
   const ctx = canvas.getContext("2d");
 
-  const img = new Image();
-  img.src = imgRed;
+  let redImage = new Image();
+  redImage.src = imgRed;
+  redImage.onload = () => drawImages(); 
 
-  let currentImage = new Image();
-  currentImage.src = imgRed;
-  currentImage.onload = () => drawImage();
+  let blueImage = new Image();
+  blueImage.src = imgBlue;
+  blueImage.onload = () => drawImages();
+
+  let currentColor = "red";
+
   // Due to selection element not being rendered yet
   setTimeout(() => {
     var selectedRobot = document.getElementById("robot");
     selectedRobot.addEventListener("change", function () {
       if (this.value.charAt(0) == "B") {
-        currentImage.src = imgBlue;
+        currentColor = "blue";
       } else {
-        currentImage.src = imgRed;
+        currentColor = "red";
       }
-      console.log(currentImage.src);
-      currentImage.onload = () => {
-        startingPosition = null;
-        drawImage();
-      };
+      console.log(redImage.src);
+      drawImages();
     });
   }, 1000);
 
@@ -272,28 +273,24 @@ function createClickImage({
 
     startingPosition = { x, y };
 
-    drawImage();
+    drawImages();
     drawMarker(startingPosition.x, startingPosition.y);
 
     console.log(`Clicked at: (${x}, ${y})`);
   });
 
-  function drawImage() {
-    // Resize canvas to match the image
-    canvas.width = currentImage.naturalWidth;
-    canvas.height = currentImage.naturalHeight;
+  function drawImages() {
+    canvas.width = redImage.naturalWidth * 2;
+    canvas.height = blueImage.naturalHeight;
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(currentImage, 0, 0);
+    // Resize canvas to match the image
+    ctx.drawImage(blueImage, 0, 0);
+    ctx.drawImage(redImage, canvas.width / 2, 0);
   }
 
   function drawMarker(x, y) {
     radius = 32;
-    if (currentImage.src == imgBlue) {
-      ctx.fillStyle = "blue";
-    } else {
-      ctx.fillStyle = "red";
-    }
+    ctx.fillStyle = currentColor;
     ctx.beginPath();
     ctx.rect(x - radius / 2, y - radius / 2, radius, radius);
     ctx.fill();

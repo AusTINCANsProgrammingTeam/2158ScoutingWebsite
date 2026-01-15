@@ -209,6 +209,8 @@ function showTeamDetail(teamNumber) {
                 </div>
             </div>
         </div>
+        <div id="matchField">
+        </div>
         <h4 class="mb-0">Match History</h4>
         <div class="table-responsive">
             <table class="table table-dark table-sm">
@@ -225,7 +227,7 @@ function showTeamDetail(teamNumber) {
                 <tbody>
                     ${teamMatches.map(m => `
                         <tr>
-                            <td>${m.matchNumber}</td>
+                            <td class="matchNumber" data-startx="${m.startingPosX}" data-starty="${m.startingPosY}">${m.matchNumber}</td>
                             <td>${num(m.AutoCorL1) + num(m.AutoCorL2) + num(m.AutoCorL3) + num(m.AutoCorL4)}</td>
                             <td>${num(m.TeleCorL1) + num(m.TeleCorL2) + num(m.TeleCorL3) + num(m.TeleCorL4)}</td>
                             <td>${num(m.AutoAlgProcess) + num(m.AutoAlgNet) + num(m.TeleAlgProcess) + num(m.TeleAlgNet)}</td>
@@ -241,6 +243,46 @@ function showTeamDetail(teamNumber) {
     document.getElementById('teamDetailBody').innerHTML = html;
     document.getElementById('teamDetail').style.display = 'block';
     document.getElementById('teamDetail').scrollIntoView({ behavior: 'smooth' });
+
+    let redFieldImage = new Image();
+    redFieldImage.src = "../img/field_2025_red.png";
+    let blueFieldImage = new Image();
+    blueFieldImage.src = "../img/field_2025_blue.png";
+
+    let matchField = document.getElementById('matchField');
+
+    let canvas = document.createElement('canvas');
+    canvas.width = redFieldImage.naturalWidth * 2;
+    canvas.height = redFieldImage.naturalHeight;
+    canvas.style.paddingLeft = "30px";
+    canvas.style.display = "none";
+    matchField.appendChild(canvas);
+
+    let ctx = canvas.getContext('2d');
+
+    let elements = document.getElementsByClassName('matchNumber');
+    for (let element of elements) {
+        element.addEventListener('mouseenter', () => {
+            canvas.style.position = "absolute";
+            canvas.style.display = "block";
+            ctx.drawImage(blueFieldImage, 0, 0);
+            ctx.drawImage(redFieldImage, canvas.width / 2, 0);
+            console.log(element.dataset.startx + ", " + element.dataset.starty);
+            drawMarker(element.dataset.startx, element.dataset.starty);
+        });
+        element.addEventListener('mouseleave', () => {
+            canvas.style.display = "none";
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        });
+    }
+
+    function drawMarker(x, y) {
+        radius = 32;
+        ctx.fillStyle = "yellow";
+        ctx.beginPath();
+        ctx.rect(x - radius / 2, y - radius / 2, radius, radius);
+        ctx.fill();
+    }
 }
 
 

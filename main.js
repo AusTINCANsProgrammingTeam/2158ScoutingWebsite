@@ -1,6 +1,5 @@
 require('dotenv').config()
 
-var XMLHttpRequest = require('xmlhttprequest').XMLHttpRequest;
 const axios = require('axios')
 
 const functions = require("firebase-functions");
@@ -9,8 +8,6 @@ const cors = require('cors')
 const googleSpreadSheet =  require('google-spreadsheet');
 const googleAuth = require('google-auth-library');
 var sheet;
-
-const fetch = require('node-fetch')
 
 // Initialize auth - see https://theoephraim.github.io/node-google-spreadsheet/#/guides/authentication
 const serviceAccountAuth = new googleAuth.JWT({

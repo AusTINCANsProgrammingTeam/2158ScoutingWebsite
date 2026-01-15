@@ -59,7 +59,9 @@ function aggregateByTeam() {
                 totalAutoScore: 0,
                 climbs: 0,
                 totalOffense: 0,
-                totalDefense: 0
+                totalDefense: 0,
+                startingPosX: 0,
+                startingPosY: 0
             };
         }
         
@@ -83,6 +85,8 @@ function aggregateByTeam() {
         teams[team].climbs += (d.endgamePos === 'Sh' || d.endgamePos === 'Os') ? 1 : 0;
         teams[team].totalOffense += num(d.offskillrate);
         teams[team].totalDefense += num(d.defskillrate);
+        teams[team].startingPosX += num(d.startingPosX);
+        teams[team].startingPosY += num(d.startingPosY);
     });
 
     Object.keys(teams).forEach(team => {
