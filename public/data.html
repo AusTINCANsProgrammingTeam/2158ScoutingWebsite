@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,13 +9,21 @@
     <link rel="stylesheet" href="/css/data.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+
 <body class="background">
     <div class="container-fluid">
         <h1 class="text-center mb-4">Team Data</h1>
-        
+
         <div class="card" id="loaderCard">
             <div class="card-header">
                 Data Source
+                <div class="config-selector">
+                    <label for="configSelect">Config:</label>
+                    <select id="configSelect" class="form-select"></select>
+                    <label for="compSelect">Competition:</label>
+                    <select id="compSelect" class="form-select"></select>
+                    <button id="loadDataBtn" class="btn btn-primary">Load</button>
+                </div>
                 <button class="btn btn-sm btn-secondary float-end" onclick="toggleLoader()">Hide</button>
             </div>
             <div class="card-body">
@@ -42,7 +51,7 @@
 
         <div id="chartsSection" style="display:none;">
             <h2 class="mt-4 mb-3">Performance Charts</h2>
-            
+
             <div class="row">
                 <div class="col-md-6">
                     <div class="card">
@@ -54,7 +63,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="col-md-6">
                     <div class="card">
                         <div class="card-header">Scoring by Type per Match</div>
@@ -66,7 +75,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="row">
                 <div class="col-md-6">
                     <div class="card">
@@ -81,7 +90,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="col-md-6">
                     <div class="card">
                         <div class="card-header">Matches With Penalties</div>
@@ -157,4 +166,5 @@
     <script src="/js/loadData.js"></script>
     <script src="/js/data.js"></script>
 </body>
+
 </html>

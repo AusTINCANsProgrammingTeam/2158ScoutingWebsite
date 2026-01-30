@@ -5,11 +5,27 @@
     "Config": {
       "type": "object",
       "properties": {
-        "title": {
-          "type": "string"
-        },
         "page_title": {
           "type": "string"
+        },
+        "year": {
+          "type": "number"
+        },
+        "refs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "ref": {
+                "type": "string"
+              }
+            },
+            "required": ["name", "ref"],
+            "additionalProperties": false
+          }
         },
         "sections": {
           "type": "array",
@@ -71,6 +87,9 @@
           "type": "number"
         },
         "max": {
+          "type": "number"
+        },
+        "step": {
           "type": "number"
         }
       },

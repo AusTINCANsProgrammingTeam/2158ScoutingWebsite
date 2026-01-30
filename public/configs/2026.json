@@ -1,7 +1,17 @@
 {
-    "$schema": "./schema.json",
-    "title": "QRScout",
+    "$schema": "schemaSeason.json",
     "page_title": "REBUILT",
+    "year": 2026,
+    "refs": [
+        {
+            "name": "2026 Texas McAllen",
+            "ref": "2026/txmca"
+        },
+        {
+            "name": "2026 Texas Dripping Springs",
+            "ref": "2026/txdri"
+        }
+    ],
     "sections": [
         {
             "name": "Autonomous",

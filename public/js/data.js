@@ -3,22 +3,15 @@ let currentSortColumn = 'avgTotalCoral';
 let currentSortDirection = 'desc';
 let selectedColumns = ['avgTotalScore', 'avgAutoScore', 'climbRate', 'avgOffense', 'avgDefense'];
 
-// TODO: Auto update columns based on available data
-const availableColumns = {
-    'avgTotalCoral': { label: 'Avg Coral', format: (val) => val.toFixed(1) },
-    'avgAutoCoral': { label: 'Avg Auto Coral', format: (val) => val.toFixed(1) },
-    'avgTeleCoral': { label: 'Avg Tele Coral', format: (val) => val.toFixed(1) },
-    'avgTotalAlgae': { label: 'Avg Algae', format: (val) => val.toFixed(1) },
-    'avgAutoAlgae': { label: 'Avg Auto Algae', format: (val) => val.toFixed(1) },
-    'avgTeleAlgae': { label: 'Avg Tele Algae', format: (val) => val.toFixed(1) },
-    'climbRate': { label: 'Climb %', format: (val) => val.toFixed(0) + '%' },
-    'avgOffense': { label: 'Offense', format: (val) => val.toFixed(1) },
-    'avgDefense': { label: 'Defense', format: (val) => val.toFixed(1) },
-    'avgTeleopScore': { label: 'Avg Teleop Score', format: (val) => val.toFixed(1) },
-    'avgAutoScore': { label: 'Avg Auto Score', format: (val) => val.toFixed(1) },
-    'avgTotalScore': { label: 'Avg Total Score', format: (val) => val.toFixed(1) },
-    'matches': { label: 'Matches', format: (val) => val }
-};
+function analyzeData() {
+    if (scoutingData.length === 0) return;
+
+    populateTeamSelector();
+    displayTeamTable();
+    
+    document.getElementById('teamSelector').style.display = 'block';
+    document.getElementById('teamTable').style.display = 'block';
+}
 
 function toggleLoader() {
     const card = document.getElementById('loaderCard');
@@ -108,17 +101,8 @@ function sortTable(column) {
     displayTeamTable();
 }
 
-function displayTeamTable() {
-    const teamData = aggregateByTeam();
-    
-    // TODO: Calculate average scores and other derived metrics automatically instead of in browser
-    Object.keys(teamData).forEach(team => {
-        teamData[team].avgTotalScore = teamData[team].avgTeleopScore + teamData[team].avgAutoScore;
-        teamData[team].avgAutoAlgae = teamData[team].totalAutoAlgae / teamData[team].matches;
-        teamData[team].avgTeleAlgae = teamData[team].totalTeleAlgae / teamData[team].matches;
-    });
-    
-    const sorted = Object.entries(teamData).sort((a, b) => {
+function displayTeamTable() {    
+    const sorted = Object.entries(teams).sort((a, b) => {
         const aVal = a[1][currentSortColumn] || 0;
         const bVal = b[1][currentSortColumn] || 0;
         
@@ -176,7 +160,7 @@ function selectTeamFromTable(team) {
 
 function showTeamDetail(teamNumber) {
     const teamMatches = getTeamMatches(teamNumber);
-    const teamStats = aggregateByTeam()[teamNumber];
+    const teamStats = teams[teamNumber];
     
     document.getElementById('detailTeamNumber').textContent = teamNumber;
     
@@ -378,15 +362,14 @@ function createScoreByTypeChart(teamData, matchNumbers) {
 }
 
 function createRadarChart() {
-    const allTeamData = aggregateByTeam();
-    const thisTeam = allTeamData[selectedTeam];
+    const thisTeam = teams[selectedTeam];
     
     // TODO: Calculate in server and save to database instead of in browser
-    const allOffense = Object.values(allTeamData).map(t => t.avgOffense).sort((a, b) => a - b);
-    const allDefense = Object.values(allTeamData).map(t => t.avgDefense).sort((a, b) => a - b);
-    const allTeleop = Object.values(allTeamData).map(t => t.avgTeleCoral).sort((a, b) => a - b);
-    const allAuto = Object.values(allTeamData).map(t => t.avgAutoCoral).sort((a, b) => a - b);
-    const allClimb = Object.values(allTeamData).map(t => t.climbRate).sort((a, b) => a - b);
+    const allOffense = Object.values(teams).map(t => t.avgOffense).sort((a, b) => a - b);
+    const allDefense = Object.values(teams).map(t => t.avgDefense).sort((a, b) => a - b);
+    const allTeleop = Object.values(teams).map(t => t.avgTeleCoral).sort((a, b) => a - b);
+    const allAuto = Object.values(teams).map(t => t.avgAutoCoral).sort((a, b) => a - b);
+    const allClimb = Object.values(teams).map(t => t.climbRate).sort((a, b) => a - b);
 
     charts.radar = new Chart(document.getElementById('radarChart'), {
         type: 'radar',
@@ -444,7 +427,7 @@ function createRadarChart() {
 }
 
 function renderPenaltyTable() {
-    const penaltyMatches = getPenaltyMatches(selectedTeam);
+    const penaltyMatches = selectedTeam ? teams[selectedTeam].penaltyMatches : [];
     const tbody = document.getElementById('penaltyTableBody');
     
     if (penaltyMatches.length === 0) {

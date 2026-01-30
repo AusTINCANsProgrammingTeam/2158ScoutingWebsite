@@ -3,30 +3,7 @@ var configFileName = "2026.json";
 var form = document.getElementsByClassName("formBody")[0];
 
 let currentConfigVersion = "2026.json";
-
-document
-  .getElementById("loadConfigBtn")
-  .addEventListener("click", function (e) {
-    e.preventDefault();
-    const selectedConfig = document.getElementById("configSelect").value;
-    configFileName = selectedConfig;
-    currentConfigVersion = selectedConfig;
-    form.innerHTML = "";
-    window.scrollTo({ top: 0, behavior: "smooth" });
-    websiteBuilder()
-  });
-
-document
-  .getElementById("configSelect")
-  .addEventListener("change", function (e) {
-    document.getElementById('loadConfigBtn').click();
-  });
-
-document.addEventListener("DOMContentLoaded", function () {
-  const selectedConfig = document.getElementById("configSelect").value;
-  configFileName = selectedConfig;
-  currentConfigVersion = selectedConfig;
-});
+let configYear = 2026;
 
 // Prematch
 const prematchConfig = {
@@ -70,24 +47,63 @@ const prematchConfig = {
       defaultValue: "0",
     },
     { title: "No Show", type: "checkbox", code: "noShow", defaultValue: false },
-    {
-      title: "Starting Position",
-      type: "clickImg",
-      required: true,
-      imgRed: "../img/field_2025_red.png",
-      imgBlue: "../img/field_2025_blue.png",
-      code: "startingPosition",
-      defaultValue: "",
-    },
   ],
 };
 
 // Form Variables
 var startingPosition = (0, 0);
 
+document
+    .getElementById("loadConfigBtn")
+    .addEventListener("click", function (e) {
+      e.preventDefault();
+      const selectedConfig = document.getElementById("configSelect").value;
+      configFileName = selectedConfig;
+      currentConfigVersion = selectedConfig;
+      form.innerHTML = "";
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      websiteBuilder()
+      loadConfigs();
+    });
+
+  document
+    .getElementById("configSelect")
+    .addEventListener("change", function (e) {
+      document.getElementById('loadConfigBtn').click();
+    });
+
 /*
  *  Init
  */
+
+async function loadConfigs() {
+  let request = await fetch("../configs/configs.json")
+  let configs = await request.json()
+  document.getElementById("compSelect").innerHTML = "";
+  document.getElementById("configSelect").innerHTML = ""; 
+  configs.configs.forEach((config) => {
+    let option = document.createElement("option");
+    option.value = config.file;
+    option.textContent = config.name;
+    document.getElementById("configSelect").appendChild(option);
+    document.getElementById("configSelect").value = currentConfigVersion;
+  });
+  
+  const selectedConfig = document.getElementById("configSelect").value;
+  configFileName = selectedConfig;
+  currentConfigVersion = selectedConfig;
+
+  const response = await fetch("../configs/" + configFileName);
+  const data = await response.json();
+  data.refs.forEach((ref) => {
+    let option = document.createElement("option");
+    option.value = ref.ref;
+    option.textContent = ref.name;
+    document.getElementById("compSelect").appendChild(option);
+    document.getElementById("compSelect").value = ref.ref;
+  });
+  configYear = data.year;
+}
 async function websiteBuilder() {
   const response = await fetch("../configs/" + configFileName);
   const data = await response.json();
@@ -98,6 +114,7 @@ async function websiteBuilder() {
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
+  loadConfigs();
   websiteBuilder()
 });
 
@@ -361,10 +378,18 @@ function submitFunction(e) {
   const data = new FormData(e.target).entries();
   const formData = Object.fromEntries(data);
   formData.startingPos = `${startingPosition.x}, ${startingPosition.y}`;
+  formData.configVer = currentConfigVersion;
+  formData.competitionRef = document.getElementById("compSelect").value;
+  formData.year = configYear;
+
+  console.log("Submitting Form Data:", formData);
 
   fetch(apiUrl + "/submit-form", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      "ref": formData.competitionRef,
+    },
     body: JSON.stringify(formData),
   });
 }
@@ -474,8 +499,10 @@ function addFormButtons() {
     const formData = new FormData(form);
     const formKeys = Object.keys(Object.fromEntries(formData.entries()));
     formData.configVersion = currentConfigVersion;
+    formData.competitionRef = document.getElementById("compSelect").value;
     formKeys.push("startingPos");
     formKeys.push("configVer");
+    formKeys.push("competitionRef");
     console.log(formKeys.join(", "));
   };
 
