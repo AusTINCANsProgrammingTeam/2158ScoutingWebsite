@@ -2,6 +2,7 @@
   "$schema": "schemaSeason.json",
   "page_title": "Reefscape",
   "year": 2025,
+  "fieldImage": "img/field25.png",
   "refs": [
     {
       "name": "2025 Texas Manor",

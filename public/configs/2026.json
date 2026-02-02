@@ -2,6 +2,7 @@
     "$schema": "schemaSeason.json",
     "page_title": "REBUILT",
     "year": 2026,
+    "fieldImage": "img/field26.png",
     "refs": [
         {
             "name": "2026 Texas McAllen",

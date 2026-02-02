@@ -11,6 +11,9 @@
         "year": {
           "type": "number"
         },
+        "fieldImage": {
+          "type": "string"
+        },
         "refs": {
           "type": "array",
           "items": {
