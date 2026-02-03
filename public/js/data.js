@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 class ChartState {
   constructor() {
     this.charts = {};
-    this.currentSortColumn = 'avgTotalCoral';
+    this.currentSortColumn = 'avgTotalScore';
     this.currentSortDirection = 'desc';
     this.selectedColumns = ['avgTotalScore', 'avgAutoScore', 'climbRate', 'avgOffense', 'avgDefense'];
   }
@@ -277,9 +277,7 @@ class TeamDetailRenderer {
     const html = `
       ${this.renderStatBoxes(teamStats)}
       <h4 class="mb-0" style="color: #FFF01F;">Match History</h4>
-      ${
-        this.renderMatchHistoryTable(teamMatches)
-      }
+      ${this.renderMatchHistoryTable(teamMatches)}
     `;
 
     uiManager.setInnerHTML('teamDetailBody', html);
@@ -288,131 +286,59 @@ class TeamDetailRenderer {
   }
 
   renderStatBoxes(stats) {
-    return `
-      <div class="row mb-4">
-        <div class="col-md-3">
-          <div class="stat-box">
-            <p>Avg Teleop Score</p>
-            <h3>${stats.avgTeleopScore.toFixed(1)}</h3>
-          </div>
-        </div>
-        <div class="col-md-3">
-          <div class="stat-box">
-            <p>Avg Auto Score</p>
-            <h3>${stats.avgAutoScore.toFixed(1)}</h3>
-          </div>
-        </div>
-        <div class="col-md-3">
-          <div class="stat-box">
-            <p>Offense Rating</p>
-            <h3>${stats.avgOffense.toFixed(1)}</h3>
-          </div>
-        </div>
-        <div class="col-md-3">
-          <div class="stat-box">
-            <p>Defense Rating</p>
-            <h3>${stats.avgDefense.toFixed(1)}</h3>
-          </div>
-        </div>
-      </div>
-    `;
-  }
-
-  // TODO: recheck yearly implementation
-  // TODO: Consider refactoring to seperate per year classes for each breakdown
-  renderMatchHistoryTable(matches) {
-    if (year === 2026) {
-      return this.renderMatchHistoryTable2026(matches);
-    } else {
-      return this.renderMatchHistoryTable2025(matches);
+    if (!currentYearConfig) {
+      console.error('No year configuration loaded');
+      return '<p>Unable to display stats</p>';
     }
+
+    const statBoxes = currentYearConfig.getStatBoxes(stats);
+
+    let html = '<div class="row mb-4">';
+    statBoxes.forEach((stat, index) => {
+      if (index > 0 && index % 4 === 0) {
+        html += '</div><div class="row mb-4">';
+      }
+      html += `
+        <div class="col-md-3">
+          <div class="stat-box">
+            <p>${stat.label}</p>
+            <h3>${stat.value}</h3>
+          </div>
+        </div>
+      `;
+    });
+    html += '</div>';
+
+    return html;
   }
-  
-  renderMatchHistoryTable2025(matches) {
+
+  renderMatchHistoryTable(matches) {
+    if (!currentYearConfig) {
+      return '<p>Match history table not available.</p>';
+    }
+
+    const columns = currentYearConfig.getMatchHistoryColumns();
+
     return `
       <div class="table-responsive">
         <table class="table table-dark table-sm">
           <thead>
             <tr>
-              <th>Match</th>
-              <th>Auto Coral</th>
-              <th>Tele Coral</th>
-              <th>Algae</th>
-              <th>Endgame</th>
-              <th>Fouls</th>
+              ${columns.map(col => `<th>${col.label}</th>`).join('')}
             </tr>
           </thead>
           <tbody>
-            ${matches.map(m => this.renderMatchRow2025(m)).join('')}
+            ${matches.map(match => this.renderMatchRow(match, columns)).join('')}
           </tbody>
         </table>
       </div>
     `;
   }
 
-  renderMatchHistoryTable2026(matches) {
-    return `
-      <div class="table-responsive">
-        <table class="table table-dark table-sm">
-          <thead>
-            <tr>
-              <th>Match</th>
-              <th>Auto Fuel</th>
-              <th>Tele Fuel</th>
-              <th>Endgame</th>
-              <th>Fouls</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${matches.map(m => this.renderMatchRow2026(m)).join('')}
-          </tbody>
-        </table>
-      </div>
-    `;
-  }
-
-  renderMatchRow2026(match) {
+  renderMatchRow(match, columns) {
     return `
       <tr>
-        <td>${match.matchNumber}</td>
-        <td>${match.AutoFuelScore || 0}</td>
-        <td>${match.TeleFuelScore || 0}</td>
-        <td>${match.endgamePos || 'N/A'}</td>
-        <td>${match.Fouls || 0}</td>
-      </tr>
-    `;
-  }
-
-  renderMatchRow2025(match) {
-    const autoCoral = sum([
-      num(match.AutoCorL1),
-      num(match.AutoCorL2),
-      num(match.AutoCorL3),
-      num(match.AutoCorL4)
-    ]);
-
-    const teleCoral = sum([
-      num(match.TeleCorL1),
-      num(match.TeleCorL2),
-      num(match.TeleCorL3),
-      num(match.TeleCorL4)
-    ]);
-
-    const algae = sum([
-      num(match.AutoAlgProcess),
-      num(match.AutoAlgNet),
-      num(match.TeleAlgProcess),
-      num(match.TeleAlgNet)
-    ]);
-
-    return `
-      <tr>
-        <td>${match.matchNumber}</td>
-        <td>${autoCoral}</td>
-        <td>${teleCoral}</td>
-        <td>${algae}</td>
-        <td>${match.endgamePos || 'N/A'}</td>
-        <td>${match.Fouls || 0}</td>
+        ${columns.map(col => `<td>${match[col.key] || 0}</td>`).join('')}
       </tr>
     `;
   }
@@ -420,13 +346,20 @@ class TeamDetailRenderer {
 
 class ChartFactory {
   createScoringChart(canvasId, teamData, matchNumbers) {
-    const autoScores = year === 2025 
-      ? this.calculateAutoScores2025(teamData, matchNumbers)
-      : this.calculateAutoScores2026(teamData, matchNumbers);
-    
-    const teleopScores = year === 2025
-      ? this.calculateTeleopScores2025(teamData, matchNumbers)
-      : this.calculateTeleopScores2026(teamData, matchNumbers);
+    if (!currentYearConfig) {
+      console.error('No year configuration loaded');
+      return null;
+    }
+
+    const autoScores = matchNumbers.map(match => {
+      const matchData = teamData.filter(d => num(d.matchNumber) === match);
+      return sum(matchData.map(d => currentYearConfig.calculateAutoScore(d, Utils)));
+    });
+
+    const teleopScores = matchNumbers.map(match => {
+      const matchData = teamData.filter(d => num(d.matchNumber) === match);
+      return sum(matchData.map(d => currentYearConfig.calculateTeleopScore(d, Utils)));
+    });
 
     return new Chart(document.getElementById(canvasId), {
       type: 'bar',
@@ -466,14 +399,12 @@ class ChartFactory {
   }
 
   createScoreByTypeChart(canvasId, teamData, matchNumbers) {
-    const datasets = year === 2026 
-      ? [{ label: 'Fuel', data: this.calculateLevelScores(teamData, matchNumbers, 'AutoFuelScore'), color: '#FFF01F' }]
-      : [
-          { label: 'L1', data: this.calculateLevelScores(teamData, matchNumbers, 'TeleCorL1'), color: '#FFF01F' },
-          { label: 'L2', data: this.calculateLevelScores(teamData, matchNumbers, 'TeleCorL2'), color: '#0dcaf0' },
-          { label: 'L3', data: this.calculateLevelScores(teamData, matchNumbers, 'TeleCorL3'), color: '#198754' },
-          { label: 'L4', data: this.calculateLevelScores(teamData, matchNumbers, 'TeleCorL4'), color: '#dc3545' }
-        ];
+    if (!currentYearConfig) {
+      console.error('No year configuration loaded');
+      return null;
+    }
+
+    const datasets = currentYearConfig.getScoreByTypeDatasets(teamData, matchNumbers, Utils);
 
     return new Chart(document.getElementById(canvasId), {
       type: 'bar',
@@ -508,7 +439,7 @@ class ChartFactory {
     return new Chart(document.getElementById(canvasId), {
       type: 'radar',
       data: {
-        labels: ['Defense', 'Offense', 'Teleop Coral', 'Auto Coral', 'Climb Rate'],
+        labels: ['Defense', 'Offense', 'Teleop Ranking', 'Auto Ranking', 'Climb Rate'],
         datasets: [{
           label: 'Team Percentile',
           data: percentiles,
@@ -548,69 +479,20 @@ class ChartFactory {
     });
   }
 
-  calculateAutoScores2025(teamData, matchNumbers) {
-    return matchNumbers.map(match => {
-      const matchData = teamData.filter(d => num(d.matchNumber) === match);
-      return sum(matchData.map(d =>
-        num(d.AutoCorL1) * 3 +
-        num(d.AutoCorL2) * 4 +
-        num(d.AutoCorL3) * 6 +
-        num(d.AutoCorL4) * 7 +
-        num(d.AutoAlgProcess) * 6 +
-        num(d.AutoAlgNet) * 4
-      ));
-    });
-  }
-
-  calculateAutoScores2026(teamData, matchNumbers) {
-    return matchNumbers.map(match => {
-      const matchData = teamData.filter(d => num(d.matchNumber) === match);
-      return sum(matchData.map(d => num(d.AutoFuelScore)));
-    });
-  }
-
-  calculateTeleopScores2025(teamData, matchNumbers) {
-    return matchNumbers.map(match => {
-      const matchData = teamData.filter(d => num(d.matchNumber) === match);
-      return sum(matchData.map(d =>
-        num(d.TeleCorL1) * 2 +
-        num(d.TeleCorL2) * 3 +
-        num(d.TeleCorL3) * 4 +
-        num(d.TeleCorL4) * 5 +
-        num(d.TeleAlgProcess) * 6 +
-        num(d.TeleAlgNet) * 4
-      ));
-    });
-  }
-
-  calculateTeleopScores2026(teamData, matchNumbers) {
-    return matchNumbers.map(match => {
-      const matchData = teamData.filter(d => num(d.matchNumber) === match);
-      return sum(matchData.map(d => num(d.TeleFuelScore)));
-    });
-  }
-
-  calculateLevelScores(teamData, matchNumbers, field) {
-    return matchNumbers.map(match => {
-      const matchData = teamData.filter(d => num(d.matchNumber) === match);
-      return sum(matchData.map(d => num(d[field])));
-    });
-  }
-
   calculatePercentiles(thisTeam) {
     const allStats = {
       defense: Object.values(teams).map(t => t.avgDefense).sort((a, b) => a - b),
       offense: Object.values(teams).map(t => t.avgOffense).sort((a, b) => a - b),
-      teleop: Object.values(teams).map(t => t.avgTeleCoral).sort((a, b) => a - b),
-      auto: Object.values(teams).map(t => t.avgAutoCoral).sort((a, b) => a - b),
+      teleop: Object.values(teams).map(t => t.avgTeleopScore).sort((a, b) => a - b),
+      auto: Object.values(teams).map(t => t.avgAutoScore).sort((a, b) => a - b),
       climb: Object.values(teams).map(t => t.climbRate).sort((a, b) => a - b)
     };
 
     return [
       getPercentile(thisTeam.avgDefense, allStats.defense),
       getPercentile(thisTeam.avgOffense, allStats.offense),
-      getPercentile(thisTeam.avgTeleCoral, allStats.teleop),
-      getPercentile(thisTeam.avgAutoCoral, allStats.auto),
+      getPercentile(thisTeam.avgTeleopScore, allStats.teleop),
+      getPercentile(thisTeam.avgAutoScore, allStats.auto),
       getPercentile(thisTeam.climbRate, allStats.climb)
     ];
   }

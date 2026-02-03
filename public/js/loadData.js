@@ -7,6 +7,7 @@ let availableColumns = {};
 let teams = {};
 let datasets = {};
 let currentConfigVersion = "2026.json";
+let currentYearConfig = null; // Holds the active year configuration
 
 var year = parseInt(currentConfigVersion.split(".")[0]);
 
@@ -105,263 +106,25 @@ class DataLoader {
 
 class DataAggregator {
   aggregate(data, year) {
-    const aggregators = {
-      2025: this.aggregate2025.bind(this),
-      2026: this.aggregate2026.bind(this)
-    };
-
-    const aggregator = aggregators[year];
-    if (!aggregator) {
-      console.warn(`No aggregator found for year ${year}`);
+    if (!yearConfigRegistry.hasConfig(year)) {
+      console.error(`No configuration available for year ${year}`);
       return { teams: {}, columns: {} };
     }
 
-    return aggregator(data);
-  }
+    currentYearConfig = yearConfigRegistry.get(year);
 
-  aggregate2025(data) {
+    teams = {};
+
     data.forEach(match => {
       const teamNum = match.teamNumber;
-
-      this.updateTeamStats2025(teamNum, match);
+      currentYearConfig.updateTeamStats(teamNum, match, teams, Utils);
     });
 
-    this.calculateAverages2025(teams);
+    currentYearConfig.calculateAverages(teams);
 
-    const columns = {
-      'avgTotalCoral': { label: 'Avg Coral', format: (val) => val.toFixed(1) },
-      'avgAutoCoral': { label: 'Avg Auto Coral', format: (val) => val.toFixed(1) },
-      'avgTeleCoral': { label: 'Avg Tele Coral', format: (val) => val.toFixed(1) },
-      'avgTotalAlgae': { label: 'Avg Algae', format: (val) => val.toFixed(1) },
-      'climbRate': { label: 'Climb %', format: (val) => val.toFixed(0) + '%' },
-      'avgOffense': { label: 'Offense', format: (val) => val.toFixed(1) },
-      'avgDefense': { label: 'Defense', format: (val) => val.toFixed(1) },
-      'avgTeleopScore': { label: 'Avg Teleop Score', format: (val) => val.toFixed(1) },
-      'avgAutoScore': { label: 'Avg Auto Score', format: (val) => val.toFixed(1) },
-      'avgTotalScore': { label: 'Avg Total Score', format: (val) => val.toFixed(1) },
-      'matches': { label: 'Matches', format: (val) => val }
-    };
+    const columns = currentYearConfig.getColumns();
 
     return { teams, columns };
-  }
-
-  aggregate2026(data) {
-    data.forEach(match => {
-      const teamNum = match.teamNumber;
-
-      this.updateTeamStats2026(teamNum, match);
-    });
-
-    this.calculateAverages2026(teams);
-
-    const columns = {
-      'avgTotalScore': { label: 'Avg Total Score', format: (val) => val.toFixed(1) },
-      'avgTotalFuel': { label: 'Avg Fuel', format: (val) => val.toFixed(1) },
-      'avgAutoFuel': { label: 'Avg Auto Fuel', format: (val) => val.toFixed(1) },
-      'avgTeleFuel': { label: 'Avg Tele Fuel', format: (val) => val.toFixed(1) },
-      'climbRate': { label: 'Climb %', format: (val) => val.toFixed(0) + '%' },
-      'avgOffense': { label: 'Offense', format: (val) => val.toFixed(1) },
-      'avgDefense': { label: 'Defense', format: (val) => val.toFixed(1) },
-      'avgTeleopScore': { label: 'Avg Teleop Score', format: (val) => val.toFixed(1) },
-      'avgAutoScore': { label: 'Avg Auto Score', format: (val) => val.toFixed(1) },
-      'matches': { label: 'Matches', format: (val) => val }
-    };
-
-    return { teams, columns };
-  }
-
-  updateTeamStats2025(teamNum, match) {
-    const { num, sum } = Utils;
-    teams[teamNum] = teams[teamNum] || {
-      matches: 0,
-      totalAutoCoral: 0,
-      totalTeleCoral: 0,
-      totalAutoAlgae: 0,
-      totalTeleAlgae: 0,
-      totalTeleopScore: 0,
-      totalAutoScore: 0,
-      climbs: 0,
-      totalOffense: 0,
-      totalDefense: 0,
-      penaltyMatches: []
-    };
-
-    var teamStats = teams[teamNum];
-    teamStats.matches++;
-
-    // Coral
-    teamStats.totalAutoCoral += sum([
-      num(match.AutoCorL1),
-      num(match.AutoCorL2),
-      num(match.AutoCorL3),
-      num(match.AutoCorL4)
-    ]);
-
-    teamStats.totalTeleCoral += sum([
-      num(match.TeleCorL1),
-      num(match.TeleCorL2),
-      num(match.TeleCorL3),
-      num(match.TeleCorL4)
-    ]);
-
-    // Algae
-    teamStats.totalAutoAlgae += sum([
-      num(match.AutoAlgProcess),
-      num(match.AutoAlgNet)
-    ]);
-
-    teamStats.totalTeleAlgae += sum([
-      num(match.TeleAlgProcess),
-      num(match.TeleAlgNet)
-    ]);
-
-    // Point calculations
-    teamStats.totalTeleopScore += sum([
-      num(match.TeleCorL1) * 2,
-      num(match.TeleCorL2) * 3,
-      num(match.TeleCorL3) * 4,
-      num(match.TeleCorL4) * 5,
-      num(match.TeleAlgProcess) * 6,
-      num(match.TeleAlgNet) * 4
-    ]);
-
-    teamStats.totalAutoScore += sum([
-      num(match.AutoCorL1) * 3,
-      num(match.AutoCorL2) * 4,
-      num(match.AutoCorL3) * 6,
-      num(match.AutoCorL4) * 7,
-      num(match.AutoAlgProcess) * 6,
-      num(match.AutoAlgNet) * 4
-    ]);
-
-    // Endgame
-    teamStats.climbs += (match.endgamePos === 'Sh' || match.endgamePos === 'Os') ? 1 : 0;
-
-    // Skills
-    teamStats.totalOffense += num(match.offskillrate);
-    teamStats.totalDefense += num(match.defskillrate);
-
-    // Penalties
-    this.addPenalties(teamStats, match);
-  }
-
-  updateTeamStats2026(teamNum, match) {
-    const { num, sum } = Utils;
-    teams[teamNum] = teams[teamNum] || {
-      matches: 0,
-      totalAutoFuel: 0,
-      totalTeleFuel: 0,
-      totalTeleopScore: 0,
-      totalAutoScore: 0,
-      climbs: 0,
-      totalOffense: 0,
-      totalDefense: 0,
-      penaltyMatches: []
-    }
-    var teamStats = teams[teamNum];
-    teamStats.matches++;
-    console.log(match)
-
-    // Fuel
-    teamStats.totalAutoFuel += sum([
-      num(match.AutoFuelScore)
-    ]);
-
-    teamStats.totalTeleFuel += sum([
-      num(match.TeleFuelScore)
-    ]);
-
-    // Point calculations
-    teamStats.totalTeleopScore += sum([
-      num(match.TeleFuelScore)
-    ]);
-
-    teamStats.totalAutoScore += sum([
-      num(match.AutoFuelScore),
-      num(match.AutoClimb) * 15
-    ]);
-
-    // Endgame
-    teamStats.climbs += (
-      match.endgamePos === 'L1' ||
-      match.endgamePos === 'L2' ||
-      match.endgamePos === 'L3'
-    ) ? 1 : 0;
-
-    // Skills
-    teamStats.totalOffense += num(match.offskillrate);
-    teamStats.totalDefense += num(match.defskillrate);
-
-    // Penalties
-    this.addPenalties(teamStats, match);
-  }
-
-  addPenalties(teamStats, match) {
-    const penalty = {
-      match: match.matchNumber,
-      team: match.teamNumber,
-      penalties: []
-    };
-
-    if (Utils.num(match.Fouls) > 0) {
-      penalty.penalties.push(`Fouls (${match.Fouls})`);
-    }
-    if (Utils.num(match.majorFoul) > 0) {
-      penalty.penalties.push(`Major Fouls (${match.majorFoul})`);
-    }
-    if (Utils.num(match.minorFoul) > 0) {
-      penalty.penalties.push(`Minor Fouls (${match.minorFoul})`);
-    }
-    if (match.AutoFoul === 'true' || match.AutoFoul === 'on') {
-      penalty.penalties.push('Auto Foul');
-    }
-    if (match.YRCard === 'true' || match.YRCard === 'on') {
-      penalty.penalties.push('Yellow/Red Card');
-    }
-    if (match.Died === 'true' || match.Died === 'on') {
-      penalty.penalties.push('Died');
-    }
-    if (match.Tipped === 'true' || match.Tipped === 'on') {
-      penalty.penalties.push('Tipped');
-    }
-
-    if (penalty.penalties.length > 0) {
-      teamStats.penaltyMatches.push(penalty);
-    }
-  }
-
-  calculateAverages2025(teams) {
-    Object.values(teams).forEach(team => {
-      const matches = team.matches || 1;
-
-      team.avgAutoCoral = team.totalAutoCoral / matches;
-      team.avgTeleCoral = team.totalTeleCoral / matches;
-      team.avgTotalCoral = (team.totalAutoCoral + team.totalTeleCoral) / matches;
-      team.avgAutoAlgae = team.totalAutoAlgae / matches;
-      team.avgTeleAlgae = team.totalTeleAlgae / matches;
-      team.avgTotalAlgae = (team.totalAutoAlgae + team.totalTeleAlgae) / matches;
-      team.avgTeleopScore = team.totalTeleopScore / matches;
-      team.avgAutoScore = team.totalAutoScore / matches;
-      team.avgTotalScore = (team.totalAutoScore + team.totalTeleopScore) / matches;
-      team.climbRate = (team.climbs / matches) * 100;
-      team.avgOffense = team.totalOffense / matches;
-      team.avgDefense = team.totalDefense / matches;
-    });
-  }
-
-  calculateAverages2026(teams) {
-    Object.values(teams).forEach(team => {
-      const matches = team.matches || 1;
-
-      team.avgFuel = team.totalFuel / matches;
-      team.avgTeleFuel = team.totalTeleFuel / matches;
-      team.avgTeleopScore = team.totalTeleopScore / matches;
-      team.avgAutoScore = team.totalAutoScore / matches;
-      team.avgTotalScore = (team.totalAutoScore + team.totalTeleopScore) / matches;
-      team.climbRate = (team.climbs / matches) * 100;
-      team.avgOffense = team.totalOffense / matches;
-      team.avgDefense = team.totalDefense / matches;
-    });
   }
 }
 

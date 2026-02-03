@@ -100,7 +100,6 @@
                                     <thead>
                                         <tr>
                                             <th>Match</th>
-                                            <th>Team</th>
                                             <th>Penalty Type</th>
                                         </tr>
                                     </thead>
@@ -124,18 +123,7 @@
                 <div class="card-body">
                     <div class="table-responsive">
                         <table class="table table-dark table-striped table-hover">
-                            <thead id="teamTableHead">
-                                <tr>
-                                    <th>Rank</th>
-                                    <th>Team</th>
-                                    <th>Avg Coral</th>
-                                    <th>Avg Algae</th>
-                                    <th>Endgame %</th>
-                                    <th>Offense</th>
-                                    <th>Defense</th>
-                                    <th>Matches</th>
-                                </tr>
-                            </thead>
+                            <thead id="teamTableHead"></thead>
                             <tbody id="teamTableBody"></tbody>
                         </table>
                     </div>
@@ -163,6 +151,11 @@
         </div>
     </div>
 
+    <!-- Load scripts in correct order: base class first, then year configs, then registry, then app code -->
+    <script src="/js/yearConfigBase.js"></script>
+    <script src="/js/yearConfig2025.js"></script>
+    <script src="/js/yearConfig2026.js"></script>
+    <script src="/js/yearConfigRegistry.js"></script>
     <script src="/js/loadData.js"></script>
     <script src="/js/data.js"></script>
 </body>
