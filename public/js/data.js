@@ -1,469 +1,593 @@
-let charts = {};
-let currentSortColumn = 'avgTotalCoral';
-let currentSortDirection = 'desc';
-let selectedColumns = ['avgTotalScore', 'avgAutoScore', 'climbRate', 'avgOffense', 'avgDefense'];
+var chartState;
+var uiManager;
+var teamSelector;
+var columnModal;
+var tableRenderer;
 
-// TODO: Auto update columns based on available data
-const availableColumns = {
-    'avgTotalCoral': { label: 'Avg Coral', format: (val) => val.toFixed(1) },
-    'avgAutoCoral': { label: 'Avg Auto Coral', format: (val) => val.toFixed(1) },
-    'avgTeleCoral': { label: 'Avg Tele Coral', format: (val) => val.toFixed(1) },
-    'avgTotalAlgae': { label: 'Avg Algae', format: (val) => val.toFixed(1) },
-    'avgAutoAlgae': { label: 'Avg Auto Algae', format: (val) => val.toFixed(1) },
-    'avgTeleAlgae': { label: 'Avg Tele Algae', format: (val) => val.toFixed(1) },
-    'climbRate': { label: 'Climb %', format: (val) => val.toFixed(0) + '%' },
-    'avgOffense': { label: 'Offense', format: (val) => val.toFixed(1) },
-    'avgDefense': { label: 'Defense', format: (val) => val.toFixed(1) },
-    'avgTeleopScore': { label: 'Avg Teleop Score', format: (val) => val.toFixed(1) },
-    'avgAutoScore': { label: 'Avg Auto Score', format: (val) => val.toFixed(1) },
-    'avgTotalScore': { label: 'Avg Total Score', format: (val) => val.toFixed(1) },
-    'matches': { label: 'Matches', format: (val) => val }
-};
+document.addEventListener("DOMContentLoaded", async () => {
+  chartState = new ChartState();
+  uiManager = new UIManager();
+  teamSelector = new TeamSelector();
+  columnModal = new ColumnSelectorModal();
+  tableRenderer = new TeamTableRenderer();
+});
+
+
+class ChartState {
+  constructor() {
+    this.charts = {};
+    this.currentSortColumn = 'avgTotalScore';
+    this.currentSortDirection = 'desc';
+    this.selectedColumns = ['avgTotalScore', 'avgAutoScore', 'climbRate', 'avgOffense', 'avgDefense'];
+  }
+
+  setSort(column, direction) {
+    this.currentSortColumn = column;
+    this.currentSortDirection = direction;
+  }
+
+  toggleSortDirection() {
+    this.currentSortDirection = this.currentSortDirection === 'asc' ? 'desc' : 'asc';
+  }
+
+  setSelectedColumns(columns) {
+    this.selectedColumns = columns;
+  }
+
+  getSelectedColumns() {
+    return this.selectedColumns;
+  }
+
+  destroyAllCharts() {
+    Object.values(this.charts).forEach(chart => chart?.destroy());
+    this.charts = {};
+  }
+
+  addChart(name, chart) {
+    this.charts[name] = chart;
+  }
+}
+
+class UIManager {
+  show(elementId) {
+    const element = document.getElementById(elementId);
+    if (element) element.style.display = 'block';
+  }
+
+  hide(elementId) {
+    const element = document.getElementById(elementId);
+    if (element) element.style.display = 'none';
+  }
+
+  toggle(elementId) {
+    const element = document.getElementById(elementId);
+    if (element) {
+      element.style.display = element.style.display === 'none' ? 'block' : 'none';
+    }
+  }
+
+  setInnerHTML(elementId, html) {
+    const element = document.getElementById(elementId);
+    if (element) element.innerHTML = html;
+  }
+
+  getValue(elementId) {
+    const element = document.getElementById(elementId);
+    return element ? element.value : null;
+  }
+
+  setValue(elementId, value) {
+    const element = document.getElementById(elementId);
+    if (element) element.value = value;
+  }
+
+  scrollToTop() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  scrollToElement(elementId) {
+    const element = document.getElementById(elementId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  }
+}
 
 function toggleLoader() {
-    const card = document.getElementById('loaderCard');
-    const btn = card.querySelector('button');
-    
-    if (card.style.display === 'none') {
-        card.style.display = 'block';
-        btn.textContent = 'Hide';
-    } else {
-        card.style.display = 'none';
-        btn.textContent = 'Show';
-    }
+  const card = document.getElementById('loaderCard');
+  const btn = card?.querySelector('button');
+
+  if (!card || !btn) return;
+
+  if (card.style.display === 'none') {
+    card.style.display = 'block';
+    btn.textContent = 'Hide';
+  } else {
+    card.style.display = 'none';
+    btn.textContent = 'Show';
+  }
 }
 
-function populateTeamSelector() {
-    const teams = [...new Set(scoutingData.map(d => d.teamNumber))].sort((a, b) => a - b);
+class TeamSelector {
+  populateSelector(data) {
+    const teamNumbers = [...new Set(data.map(d => d.teamNumber))].sort((a, b) => a - b);
     const select = document.getElementById('teamSelect');
-    
-    select.innerHTML = '<option value="">-- Select a Team --</option>' + 
-        teams.map(team => `<option value="${team}">${team}</option>`).join('');
-}
 
-function updateTeamData() {
-    const select = document.getElementById('teamSelect');
-    selectedTeam = select.value;
-    
+    if (!select) return;
+
+    select.innerHTML = '<option value="">-- Select a Team --</option>' +
+      teamNumbers.map(team => `<option value="${team}">${team}</option>`).join('');
+  }
+
+  updateTeamData() {
+    const teamNumber = uiManager.getValue('teamSelect');
+    selectedTeam = teamNumber;
+
     if (!selectedTeam) {
-        document.getElementById('teamDetail').style.display = 'none';
-        document.getElementById('chartsSection').style.display = 'none';
-        return;
+      uiManager.hide('teamDetail');
+      uiManager.hide('chartsSection');
+      return;
     }
-    
-    showTeamDetail(selectedTeam);
-    createCharts();
-    
-    document.getElementById('teamDetail').style.display = 'block';
-    document.getElementById('chartsSection').style.display = 'block';
+
+    const detailRenderer = new TeamDetailRenderer();
+    detailRenderer.render(selectedTeam);
+
+    const chartManager = new ChartManager();
+    chartManager.createAllCharts(selectedTeam);
+
+    uiManager.show('teamDetail');
+    uiManager.show('chartsSection');
+  }
+
+  selectFromTable(teamNumber) {
+    uiManager.setValue('teamSelect', teamNumber);
+    this.updateTeamData();
+    uiManager.scrollToTop();
+  }
 }
 
-function openColumnSelector() {
+class ColumnSelectorModal {
+  open() {
     const modal = document.getElementById('columnSelectorModal');
-    const checkboxContainer = document.getElementById('columnCheckboxes');
-    checkboxContainer.innerHTML = '';
-    Object.keys(availableColumns).forEach(key => {
-        const isChecked = selectedColumns.includes(key);
-        const checkbox = `
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="${key}" 
-                       id="col_${key}" ${isChecked ? 'checked' : ''}>
-                <label class="form-check-label" for="col_${key}">
-                    ${availableColumns[key].label}
-                </label>
-            </div>
-        `;
-        checkboxContainer.innerHTML += checkbox;
-    });
-    
+    const container = document.getElementById('columnCheckboxes');
+
+    if (!modal || !container) return;
+
+    container.innerHTML = Object.entries(availableColumns).map(([key, config]) => {
+      const isChecked = chartState.getSelectedColumns().includes(key);
+      return `
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" value="${key}" 
+                 id="col_${key}" ${isChecked ? 'checked' : ''}>
+          <label class="form-check-label" for="col_${key}">
+            ${config.label}
+          </label>
+        </div>
+      `;
+    }).join('');
+
     modal.style.display = 'block';
-}
+  }
 
-function closeColumnSelector() {
-    document.getElementById('columnSelectorModal').style.display = 'none';
-}
+  close() {
+    const modal = document.getElementById('columnSelectorModal');
+    if (modal) modal.style.display = 'none';
+  }
 
-function applyColumnSelection() {
+  apply() {
     const checkboxes = document.querySelectorAll('#columnCheckboxes input[type="checkbox"]');
-    selectedColumns = Array.from(checkboxes)
-        .filter(cb => cb.checked)
-        .map(cb => cb.value);
-    
-    if (selectedColumns.length === 0) {
-        alert('Please select at least one column');
-        return;
+    const selected = Array.from(checkboxes)
+      .filter(cb => cb.checked)
+      .map(cb => cb.value);
+
+    if (selected.length === 0) {
+      alert('Please select at least one column');
+      return;
     }
-    
-    closeColumnSelector();
-    displayTeamTable();
+
+    chartState.setSelectedColumns(selected);
+    this.close();
+    tableRenderer.render();
+  }
 }
 
-function sortTable(column) {
-    if (currentSortColumn === column) {
-        currentSortDirection = currentSortDirection === 'asc' ? 'desc' : 'asc';
+class TeamTableRenderer {
+  sortTable(column) {
+    if (chartState.currentSortColumn === column) {
+      chartState.toggleSortDirection();
     } else {
-        currentSortColumn = column;
-        currentSortDirection = 'desc';
+      chartState.setSort(column, 'desc');
     }
-    displayTeamTable();
-}
+    this.render();
+  }
 
-function displayTeamTable() {
-    const teamData = aggregateByTeam();
-    
-    // TODO: Calculate average scores and other derived metrics automatically instead of in browser
-    Object.keys(teamData).forEach(team => {
-        teamData[team].avgTotalScore = teamData[team].avgTeleopScore + teamData[team].avgAutoScore;
-        teamData[team].avgAutoAlgae = teamData[team].totalAutoAlgae / teamData[team].matches;
-        teamData[team].avgTeleAlgae = teamData[team].totalTeleAlgae / teamData[team].matches;
-    });
-    
-    const sorted = Object.entries(teamData).sort((a, b) => {
-        const aVal = a[1][currentSortColumn] || 0;
-        const bVal = b[1][currentSortColumn] || 0;
-        
-        if (currentSortDirection === 'asc') {
-            return aVal - bVal;
-        } else {
-            return bVal - aVal;
-        }
-    });
+  render() {
+    const sorted = this.getSortedTeams();
+    this.renderHeader();
+    this.renderBody(sorted);
+  }
 
-    const thead = document.getElementById('teamTableHead');
+  getSortedTeams() {
+    return Object.entries(teams).sort((a, b) => {
+      const aVal = a[1][chartState.currentSortColumn] || 0;
+      const bVal = b[1][chartState.currentSortColumn] || 0;
+
+      return chartState.currentSortDirection === 'asc'
+        ? aVal - bVal
+        : bVal - aVal;
+    });
+  }
+
+  renderHeader() {
     const getSortIcon = (col) => {
-        if (currentSortColumn !== col) return '↑↓';
-        return currentSortDirection === 'asc' ? '↑' : '↓';
+      if (chartState.currentSortColumn !== col) return '↑↓';
+      return chartState.currentSortDirection === 'asc' ? '↑' : '↓';
     };
-    
-    thead.innerHTML = `
-        <tr>
-            <th onclick="sortTable('rank')" style="cursor: pointer;">
-                Rank ${getSortIcon('rank')}
-            </th>
-            <th onclick="sortTable('teamNumber')" style="cursor: pointer;">
-                Team ${getSortIcon('teamNumber')}
-            </th>
-            ${selectedColumns.map(col => `
-                <th onclick="sortTable('${col}')" style="cursor: pointer;">
-                    ${availableColumns[col].label} ${getSortIcon(col)}
-                </th>
-            `).join('')}
-            <th onclick="sortTable('matches')" style="cursor: pointer;">
-                Matches ${getSortIcon('matches')}
-            </th>
-        </tr>
+
+    const headerHTML = `
+      <tr>
+        <th onclick="tableRenderer.sortTable('rank')" style="cursor: pointer;">
+          Rank ${getSortIcon('rank')}
+        </th>
+        <th onclick="tableRenderer.sortTable('teamNumber')" style="cursor: pointer;">
+          Team ${getSortIcon('teamNumber')}
+        </th>
+        ${chartState.getSelectedColumns().map(col => `
+          <th onclick="tableRenderer.sortTable('${col}')" style="cursor: pointer;">
+            ${availableColumns[col].label} ${getSortIcon(col)}
+          </th>
+        `).join('')}
+        <th onclick="tableRenderer.sortTable('matches')" style="cursor: pointer;">
+          Matches ${getSortIcon('matches')}
+        </th>
+      </tr>
     `;
 
-    // Build table body
-    const tbody = document.getElementById('teamTableBody');
-    tbody.innerHTML = sorted.map(([team, stats], index) => `
-        <tr class="team-row" onclick="selectTeamFromTable('${team}')">
-            <td>${index + 1}</td>
-            <td>${team}</td>
-            ${selectedColumns.map(col => `
-                <td>${availableColumns[col].format(stats[col] || 0)}</td>
-            `).join('')}
-            <td>${stats.matches}</td>
-        </tr>
+    uiManager.setInnerHTML('teamTableHead', headerHTML);
+  }
+
+  renderBody(sortedTeams) {
+    const bodyHTML = sortedTeams.map(([teamNum, stats], index) => `
+      <tr class="team-row" onclick="teamSelector.selectFromTable('${teamNum}')">
+        <td>${index + 1}</td>
+        <td>${teamNum}</td>
+        ${chartState.selectedColumns.map(col => `
+          <td>${availableColumns[col].format(stats[col] || 0)}</td>
+        `).join('')}
+        <td>${stats.matches}</td>
+      </tr>
     `).join('');
+
+    uiManager.setInnerHTML('teamTableBody', bodyHTML);
+  }
 }
 
-function selectTeamFromTable(team) {
-    document.getElementById('teamSelect').value = team;
-    updateTeamData();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-function showTeamDetail(teamNumber) {
+class TeamDetailRenderer {
+  render(teamNumber) {
     const teamMatches = getTeamMatches(teamNumber);
-    const teamStats = aggregateByTeam()[teamNumber];
-    
-    document.getElementById('detailTeamNumber').textContent = teamNumber;
-    
+    const teamStats = teams[teamNumber];
 
-    // TODO: Make Auto/Teleop scores not game specific
+    if (!teamStats) {
+      console.error(`No stats found for team ${teamNumber}`);
+      return;
+    }
+
+    uiManager.setInnerHTML('detailTeamNumber', teamNumber);
+
     const html = `
-        <div class="row mb-4">
-            <div class="col-md-3">
-                <div class="stat-box">
-                    <p>Avg Teleop Score</p>
-                    <h3>${teamStats.avgTeleopScore.toFixed(1)}</h3>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stat-box">
-                    <p>Avg Auto Score</p>
-                    <h3>${teamStats.avgAutoScore.toFixed(1)}</h3>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stat-box">
-                    <p>Offense Rating</p>
-                    <h3>${teamStats.avgOffense.toFixed(1)}</h3>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stat-box">
-                    <p>Defense Rating</p>
-                    <h3>${teamStats.avgDefense.toFixed(1)}</h3>
-                </div>
-            </div>
-        </div>
-        <h4 class="mb-0">Match History</h4>
-        <div class="table-responsive">
-            <table class="table table-dark table-sm">
-                <thead>
-                    <tr>
-                        <th>Match</th>
-                        <th>Auto Coral</th>
-                        <th>Tele Coral</th>
-                        <th>Algae</th>
-                        <th>Endgame</th>
-                        <th>Fouls</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${teamMatches.map(m => `
-                        <tr>
-                            <td>${m.matchNumber}</td>
-                            <td>${num(m.AutoCorL1) + num(m.AutoCorL2) + num(m.AutoCorL3) + num(m.AutoCorL4)}</td>
-                            <td>${num(m.TeleCorL1) + num(m.TeleCorL2) + num(m.TeleCorL3) + num(m.TeleCorL4)}</td>
-                            <td>${num(m.AutoAlgProcess) + num(m.AutoAlgNet) + num(m.TeleAlgProcess) + num(m.TeleAlgNet)}</td>
-                            <td>${m.endgamePos}</td>
-                            <td>${m.Fouls}</td>
-                        </tr>
-                    `).join('')}
-                </tbody>
-            </table>
-        </div>
+      ${this.renderStatBoxes(teamStats)}
+      <h4 class="mb-0" style="color: #FFF01F;">Match History</h4>
+      ${this.renderMatchHistoryTable(teamMatches)}
     `;
-    
-    document.getElementById('teamDetailBody').innerHTML = html;
-    document.getElementById('teamDetail').style.display = 'block';
-    document.getElementById('teamDetail').scrollIntoView({ behavior: 'smooth' });
+
+    uiManager.setInnerHTML('teamDetailBody', html);
+    uiManager.show('teamDetail');
+    uiManager.scrollToElement('teamDetail');
+  }
+
+  renderStatBoxes(stats) {
+    if (!currentYearConfig) {
+      console.error('No year configuration loaded');
+      return '<p>Unable to display stats</p>';
+    }
+
+    const statBoxes = currentYearConfig.getStatBoxes(stats);
+
+    let html = '<div class="row mb-4">';
+    statBoxes.forEach((stat, index) => {
+      if (index > 0 && index % 4 === 0) {
+        html += '</div><div class="row mb-4">';
+      }
+      html += `
+        <div class="col-md-3">
+          <div class="stat-box">
+            <p>${stat.label}</p>
+            <h3>${stat.value}</h3>
+          </div>
+        </div>
+      `;
+    });
+    html += '</div>';
+
+    return html;
+  }
+
+  renderMatchHistoryTable(matches) {
+    if (!currentYearConfig) {
+      return '<p>Match history table not available.</p>';
+    }
+
+    const columns = currentYearConfig.getMatchHistoryColumns();
+
+    return `
+      <div class="table-responsive">
+        <table class="table table-dark table-sm">
+          <thead>
+            <tr>
+              ${columns.map(col => `<th>${col.label}</th>`).join('')}
+            </tr>
+          </thead>
+          <tbody>
+            ${matches.map(match => this.renderMatchRow(match, columns)).join('')}
+          </tbody>
+        </table>
+      </div>
+    `;
+  }
+
+  renderMatchRow(match, columns) {
+    return `
+      <tr>
+        ${columns.map(col => `<td>${match[col.key] || 0}</td>`).join('')}
+      </tr>
+    `;
+  }
 }
 
+class ChartFactory {
+  createScoringChart(canvasId, teamData, matchNumbers) {
+    if (!currentYearConfig) {
+      console.error('No year configuration loaded');
+      return null;
+    }
 
-//TODO: Use Factory Design Pattern for creation of charts
-function createCharts() {
-    if (!selectedTeam) return;
-    
-    Object.values(charts).forEach(chart => chart?.destroy());
-
-    const teamData = getTeamMatches(selectedTeam);
-    const matchNumbers = [...new Set(teamData.map(d => num(d.matchNumber)))].sort((a, b) => a - b);
-    
-    createScoringChart(teamData, matchNumbers);
-    createScoreByTypeChart(teamData, matchNumbers);
-    createRadarChart();
-    renderPenaltyTable();
-}
-
-function createScoringChart(teamData, matchNumbers) {
     const autoScores = matchNumbers.map(match => {
-        const matchData = teamData.filter(d => num(d.matchNumber) === match);
-        return sum(matchData.map(d => 
-            num(d.AutoCorL1) * 3 + 
-            num(d.AutoCorL2) * 4 + 
-            num(d.AutoCorL3) * 6 + 
-            num(d.AutoCorL4) * 7 +
-            num(d.AutoAlgProcess) * 6 +
-            num(d.AutoAlgNet) * 4
-        ));
+      const matchData = teamData.filter(d => num(d.matchNumber) === match);
+      return sum(matchData.map(d => currentYearConfig.calculateAutoScore(d, Utils)));
     });
 
     const teleopScores = matchNumbers.map(match => {
-        const matchData = teamData.filter(d => num(d.matchNumber) === match);
-        return sum(matchData.map(d => 
-            num(d.TeleCorL1) * 2 + 
-            num(d.TeleCorL2) * 3 + 
-            num(d.TeleCorL3) * 4 + 
-            num(d.TeleCorL4) * 5 +
-            num(d.TeleAlgProcess) * 6 +
-            num(d.TeleAlgNet) * 4
-        ));
+      const matchData = teamData.filter(d => num(d.matchNumber) === match);
+      return sum(matchData.map(d => currentYearConfig.calculateTeleopScore(d, Utils)));
     });
 
-    charts.scoring = new Chart(document.getElementById('scoringChart'), {
-        type: 'bar',
-        data: {
-            labels: matchNumbers.map(m => `Match ${m}`),
-            datasets: [{
-                label: 'Auto',
-                data: autoScores,
-                backgroundColor: '#FFF01F',
-                borderColor: '#FFF01F',
-                borderWidth: 1
-            }, {
-                label: 'Teleop',
-                data: teleopScores,
-                backgroundColor: '#0dcaf0',
-                borderColor: '#0dcaf0',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: { 
-                y: { 
-                    beginAtZero: true,
-                    title: { display: true, text: 'Points' }
-                },
-                x: {
-                    title: { display: true, text: 'Match Number' }
-                }
-            }
+    return new Chart(document.getElementById(canvasId), {
+      type: 'bar',
+      data: {
+        labels: matchNumbers.map(m => `Match ${m}`),
+        datasets: [
+          {
+            label: 'Auto',
+            data: autoScores,
+            backgroundColor: '#FFF01F',
+            borderColor: '#FFF01F',
+            borderWidth: 1
+          },
+          {
+            label: 'Teleop',
+            data: teleopScores,
+            backgroundColor: '#0dcaf0',
+            borderColor: '#0dcaf0',
+            borderWidth: 1
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true,
+            title: { display: true, text: 'Points' }
+          },
+          x: {
+            title: { display: true, text: 'Match Number' }
+          }
         }
+      }
     });
-}
+  }
 
-function createScoreByTypeChart(teamData, matchNumbers) {
-    const l1Scores = matchNumbers.map(match => {
-        const matchData = teamData.filter(d => num(d.matchNumber) === match);
-        return sum(matchData.map(d => num(d.TeleCorL1)));
-    });
-    
-    const l2Scores = matchNumbers.map(match => {
-        const matchData = teamData.filter(d => num(d.matchNumber) === match);
-        return sum(matchData.map(d => num(d.TeleCorL2)));
-    });
-    
-    const l3Scores = matchNumbers.map(match => {
-        const matchData = teamData.filter(d => num(d.matchNumber) === match);
-        return sum(matchData.map(d => num(d.TeleCorL3)));
-    });
-    
-    const l4Scores = matchNumbers.map(match => {
-        const matchData = teamData.filter(d => num(d.matchNumber) === match);
-        return sum(matchData.map(d => num(d.TeleCorL4)));
-    });
+  createScoreByTypeChart(canvasId, teamData, matchNumbers) {
+    if (!currentYearConfig) {
+      console.error('No year configuration loaded');
+      return null;
+    }
 
-    charts.scoreByType = new Chart(document.getElementById('scoreByTypePerRound'), {
-        type: 'bar',
-        data: {
-            labels: matchNumbers.map(m => `M${m}`),
-            datasets: [{
-                label: 'L1',
-                data: l1Scores,
-                backgroundColor: '#FFF01F'
-            }, {
-                label: 'L2',
-                data: l2Scores,
-                backgroundColor: '#0dcaf0'
-            }, {
-                label: 'L3',
-                data: l3Scores,
-                backgroundColor: '#198754'
-            }, {
-                label: 'L4',
-                data: l4Scores,
-                backgroundColor: '#dc3545'
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: { 
-                y: { 
-                    beginAtZero: true,
-                    title: { display: true, text: 'Amount Scored' }
-                },
-                x: {
-                    title: { display: true, text: 'Match' }
-                }
-            }
+    const datasets = currentYearConfig.getScoreByTypeDatasets(teamData, matchNumbers, Utils);
+
+    return new Chart(document.getElementById(canvasId), {
+      type: 'bar',
+      data: {
+        labels: matchNumbers.map(m => `M${m}`),
+        datasets: datasets.map(ds => ({
+          label: ds.label,
+          data: ds.data,
+          backgroundColor: ds.color
+        }))
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true,
+            title: { display: true, text: 'Amount Scored' }
+          },
+          x: {
+            title: { display: true, text: 'Match' }
+          }
         }
+      }
     });
-}
+  }
 
-function createRadarChart() {
-    const allTeamData = aggregateByTeam();
-    const thisTeam = allTeamData[selectedTeam];
-    
-    // TODO: Calculate in server and save to database instead of in browser
-    const allOffense = Object.values(allTeamData).map(t => t.avgOffense).sort((a, b) => a - b);
-    const allDefense = Object.values(allTeamData).map(t => t.avgDefense).sort((a, b) => a - b);
-    const allTeleop = Object.values(allTeamData).map(t => t.avgTeleCoral).sort((a, b) => a - b);
-    const allAuto = Object.values(allTeamData).map(t => t.avgAutoCoral).sort((a, b) => a - b);
-    const allClimb = Object.values(allTeamData).map(t => t.climbRate).sort((a, b) => a - b);
+  createRadarChart(canvasId, teamNumber) {
+    const thisTeam = teams[teamNumber];
+    const percentiles = this.calculatePercentiles(thisTeam);
 
-    charts.radar = new Chart(document.getElementById('radarChart'), {
-        type: 'radar',
-        data: {
-            labels: ['Defense', 'Offense', 'Teleop Coral', 'Auto Coral', 'Climb Rate'],
-            datasets: [{
-                label: 'Team Percentile',
-                data: [
-                    getPercentile(thisTeam.avgDefense, allDefense),
-                    getPercentile(thisTeam.avgOffense, allOffense),
-                    getPercentile(thisTeam.avgTeleCoral, allTeleop),
-                    getPercentile(thisTeam.avgAutoCoral, allAuto),
-                    getPercentile(thisTeam.climbRate, allClimb)
-                ],
-                backgroundColor: 'rgba(255, 240, 31, 0.2)',
-                borderColor: '#FFF01F',
-                borderWidth: 2,
-                pointBackgroundColor: '#FFF01F',
-                pointBorderColor: '#CCBE00',
-                pointRadius: 5
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                r: {
-                    beginAtZero: true,
-                    max: 10,
-                    ticks: {
-                        stepSize: 2,
-                        display: true
-                    },
-                    pointLabels: {
-                        font: {
-                            size: 14 
-                        }
-                    }
-                }
+    return new Chart(document.getElementById(canvasId), {
+      type: 'radar',
+      data: {
+        labels: ['Defense', 'Offense', 'Teleop Ranking', 'Auto Ranking', 'Climb Rate'],
+        datasets: [{
+          label: 'Team Percentile',
+          data: percentiles,
+          backgroundColor: 'rgba(255, 240, 31, 0.2)',
+          borderColor: '#FFF01F',
+          borderWidth: 2,
+          pointBackgroundColor: '#FFF01F',
+          pointBorderColor: '#CCBE00',
+          pointRadius: 5
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          r: {
+            beginAtZero: true,
+            max: 10,
+            ticks: {
+              stepSize: 2,
+              display: true
             },
-            plugins: {
-                legend: {
-                    display: true
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            return `Percentile: ${context.parsed.r.toFixed(1)}/10`;
-                        }
-                    }
-                }
+            pointLabels: {
+              font: { size: 14 }
             }
+          }
+        },
+        plugins: {
+          legend: { display: true },
+          tooltip: {
+            callbacks: {
+              label: (context) => `Percentile: ${context.parsed.r.toFixed(1)}/10`
+            }
+          }
         }
+      }
     });
+  }
+
+  calculatePercentiles(thisTeam) {
+    const allStats = {
+      defense: Object.values(teams).map(t => t.avgDefense).sort((a, b) => a - b),
+      offense: Object.values(teams).map(t => t.avgOffense).sort((a, b) => a - b),
+      teleop: Object.values(teams).map(t => t.avgTeleopScore).sort((a, b) => a - b),
+      auto: Object.values(teams).map(t => t.avgAutoScore).sort((a, b) => a - b),
+      climb: Object.values(teams).map(t => t.climbRate).sort((a, b) => a - b)
+    };
+
+    return [
+      getPercentile(thisTeam.avgDefense, allStats.defense),
+      getPercentile(thisTeam.avgOffense, allStats.offense),
+      getPercentile(thisTeam.avgTeleopScore, allStats.teleop),
+      getPercentile(thisTeam.avgAutoScore, allStats.auto),
+      getPercentile(thisTeam.climbRate, allStats.climb)
+    ];
+  }
 }
 
-function renderPenaltyTable() {
-    const penaltyMatches = getPenaltyMatches(selectedTeam);
+class ChartManager {
+  constructor() {
+    this.factory = new ChartFactory();
+  }
+
+  createAllCharts(teamNumber) {
+    if (!teamNumber) return;
+
+    chartState.destroyAllCharts();
+
+    const teamData = getTeamMatches(teamNumber);
+    const matchNumbers = [...new Set(teamData.map(d => num(d.matchNumber)))].sort((a, b) => a - b);
+
+    chartState.addChart('scoring',
+      this.factory.createScoringChart('scoringChart', teamData, matchNumbers)
+    );
+
+    chartState.addChart('scoreByType',
+      this.factory.createScoreByTypeChart('scoreByTypePerRound', teamData, matchNumbers)
+    );
+
+    chartState.addChart('radar',
+      this.factory.createRadarChart('radarChart', teamNumber)
+    );
+
+    this.renderPenaltyTable(teamNumber);
+  }
+
+  renderPenaltyTable(teamNumber) {
+    const penaltyMatches = teams[teamNumber]?.penaltyMatches || [];
     const tbody = document.getElementById('penaltyTableBody');
-    
+
+    if (!tbody) return;
+
     if (penaltyMatches.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="3" class="text-center">No penalties recorded</td></tr>';
-        return;
+      tbody.innerHTML = '<tr><td colspan="3" class="text-center">No penalties recorded</td></tr>';
+      return;
     }
-    
-    tbody.innerHTML = penaltyMatches.map(p => `
+
+    tbody.innerHTML = penaltyMatches
+      .filter(p => p.penalties.length > 0)
+      .map(p => `
         <tr>
-            <td>${p.match}</td>
-            <td>${p.team}</td>
-            <td>${p.penalty}</td>
+          <td>${p.match}</td>
+          <td>${p.penalties.join(', ')}</td>
         </tr>
-    `).join('');
+      `).join('');
+  }
 }
 
-window.onclick = function(event) {
-    const modal = document.getElementById('columnSelectorModal');
-    if (event.target === modal) {
-        closeColumnSelector();
-    }
+function analyzeData() {
+  if (scoutingData.length === 0) {
+    console.warn('No scouting data available');
+    return;
+  }
+
+  teamSelector.populateSelector(scoutingData);
+  tableRenderer.render();
+
+  uiManager.show('teamSelector');
+  uiManager.show('teamTable');
 }
+
+function updateTeamData() {
+  teamSelector.updateTeamData();
+}
+
+function selectTeamFromTable(teamNumber) {
+  teamSelector.selectFromTable(teamNumber);
+}
+
+function sortTable(column) {
+  tableRenderer.sortTable(column);
+}
+
+function openColumnSelector() {
+  columnModal.open();
+}
+
+function closeColumnSelector() {
+  columnModal.close();
+}
+
+function applyColumnSelection() {
+  columnModal.apply();
+}
+
+window.onclick = function (event) {
+  const modal = document.getElementById('columnSelectorModal');
+  if (event.target === modal) {
+    closeColumnSelector();
+  }
+};

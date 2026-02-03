@@ -1,7 +1,18 @@
 {
-  "$schema": "./schema.json",
-  "title": "QRScout",
+  "$schema": "schemaSeason.json",
   "page_title": "Reefscape",
+  "year": 2025,
+  "fieldImage": "img/field25.png",
+  "refs": [
+    {
+      "name": "2025 Texas Manor",
+      "ref": "2025/txman"
+    },
+    {
+      "name": "2025 Texas Waco",
+      "ref": "2025/txwac"
+    }
+  ],
   "sections": [
     {
       "name": "Autonomous",

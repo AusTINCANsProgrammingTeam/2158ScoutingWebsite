@@ -1,0 +1,13 @@
+{
+    "$schema": "schemaConfigs.json",
+    "configs": [
+        {
+            "name": "2025 - Reefscape",
+            "file": "2025.json"
+        },
+        {
+            "name": "2026 - REBUILT",
+            "file": "2026.json"
+        }
+    ]
+}

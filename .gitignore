@@ -2,3 +2,5 @@
 .vercel
 .env*.local
 node_modules/
+evaluate/
+.firebase/
