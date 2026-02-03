@@ -7,7 +7,7 @@ let availableColumns = {};
 let teams = {};
 let datasets = {};
 let currentConfigVersion = "2026.json";
-let currentYearConfig = null; // Holds the active year configuration
+let currentYearConfig = null; // the active config
 
 var year = parseInt(currentConfigVersion.split(".")[0]);
 

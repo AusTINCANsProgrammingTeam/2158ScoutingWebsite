@@ -2,18 +2,18 @@ class YearConfig2026 extends YearConfigBase {
   constructor() {
     super(2026);
 
-    // Game
+    // Game scoring values
     this.scoring = {
       auto: {
         fuel: 1,
-        climb: 15 // Auto climbing exists
+        climb: 15 // Climbing during auto exists
       },
       teleop: {
         fuel: 1
       }
     };
 
-    // Field names in the data
+    // The codes from the config
     this.fields = {
       auto: {
         fuel: 'AutoFuelScore',
@@ -23,10 +23,11 @@ class YearConfig2026 extends YearConfigBase {
         fuel: 'TeleFuelScore'
       }
     };
-
+    // Climb codes from config
     this.climbPositions = ['L1', 'L2', 'L3'];
   }
 
+  // MUST CALCULATE EVERYTHING NEEDED FOR STATS HERE
   getColumns() {
     return {
       'avgTotalScore': { label: 'Avg Total Score', format: (val) => val.toFixed(1) },
@@ -150,7 +151,7 @@ class YearConfig2026 extends YearConfigBase {
           const matchData = teamData.filter(d => num(d.matchNumber) === match);
           return sum(matchData.map(d => num(d.AutoFuelScore)));
         }),
-        color: '#FFF01F'
+        color: '#FFF01F' // Whatever color you want
       }
     ];
   }

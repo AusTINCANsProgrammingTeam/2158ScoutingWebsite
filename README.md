@@ -1,8 +1,5 @@
 
 # 2158 Scouting Website
-
-  
-
 ## Team 2158 ausTIN CAN's Scouting Website
 > SASS (Bootstrap), Javascript (Node.js, Express.js, Firebase Node SDK)
 
@@ -32,11 +29,22 @@ firebase init functions
 #Finally deploy
 firebase deploy
 ```
+- Make a [firebase real-time database](https://console.firebase.google.com/)
+- Update secrets with the url of the database ()
+```bash
+# Your apikey for cloud functions (Found in the functions page of your cloud console)
+firebase functions:secrets:set API_KEY 
+# Your database url (Found in the realtime database page of your cloud console)
+firebase functions:secrets:sete DATABASE_URL
+```
 ### Usage
 TODO: Document how to usage
 
 ### Updating
-TODO: Document Updating Steps
+- Start by duplicating `yearConfigBase.js` and renaming it to the current year
+- Write each method
+- Register the year in `yearConfigRegistry.js`
+- Update the year in `loadData.js` and `index.js`
 
 ### Docs
 - [Getting Started with Node.js](https://nodejs.org/en/learn/getting-started/introduction-to-nodejs)

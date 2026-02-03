@@ -222,7 +222,7 @@ class YearConfig2025 extends YearConfigBase {
           const matchData = teamData.filter(d => num(d.matchNumber) === match);
           return sum(matchData.map(d => num(d.TeleCorL1)));
         }),
-        color: '#FFF01F'
+        color: '#FFF01F' // Whatever colors you want
       },
       {
         label: 'L2',
