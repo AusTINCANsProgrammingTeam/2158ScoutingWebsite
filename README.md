@@ -40,9 +40,16 @@ firebase functions:secrets:sete DATABASE_URL
 ### Usage
 TODO: Document how to usage
 
-### Updating
+### Updating 
+#### Updating config
+- Duplicate a previous years config json
+- Replace game pieces with current year's
+- Be sure to use a standard naming convention for the code values
+#### Updating server-side
 - Start by duplicating `yearConfigBase.js` and renaming it to the current year
 - Write each method
+	- Use previous years for reference
+	- Use the code values from the corresponding config
 - Register the year in `yearConfigRegistry.js`
 - Update the year in `loadData.js` and `index.js`
 
