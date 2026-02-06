@@ -12,6 +12,10 @@
         "destination": "/data.html"
       },
       {
+        "source": "/view",
+        "destination": "/view.html"
+      },
+      {
         "source": "/submit-form",
         "function": "api"
       },

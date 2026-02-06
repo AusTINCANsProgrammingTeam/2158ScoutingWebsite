@@ -139,7 +139,7 @@ function renderEntries() {
             <div class="entry-header">
                 <h4 class="entry-title">Team ${entry.teamNumber} - Match ${entry.matchNumber}</h4>
                 <span class="badge-status ${entry.isValid ? 'valid' : entry.issues.length > 0 ? 'error' : 'warning'}">
-                    ${entry.isValid && entry.warnings.length === 0 ? '✓ Valid' : entry.issues.length > 0 ? '✕ Invalid' : '⚠ Warning'}
+                    ${entry.isValid && entry.warnings.length === 0 ? 'Valid' : entry.issues.length > 0 ? 'Invalid' : 'Warning'}
                 </span>
             </div>
             

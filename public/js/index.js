@@ -125,7 +125,7 @@ class UIManager {
     this.form.innerHTML = "";
   }
 
-  scrollToTop() {
+  static scrollToTop() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
@@ -142,6 +142,10 @@ class UIManager {
     select.innerHTML = refs.map(ref =>
       `<option value="${ref.ref}">${ref.name}</option>`
     ).join("");
+  }
+
+  closeConfigSelector(){
+    document.getElementsByClassName("config-selector-container")[0].style.display = "none";
   }
 
   renderSection(name, fields) {
@@ -230,20 +234,28 @@ class UIManager {
     wrapper.appendChild(this.createLabel(code, title));
 
     const spinBox = this.createElement("div", "input-group spinbox-group flex-nowrap center");
+    spinBox.style.height = "25%"
 
     const input = this.createInput("number", code, defaultValue, required);
     input.min = min;
     input.max = max;
     input.step = step;
+  
+    const decrementBtn = this.createElement("button", "btn btn-primary");
+    decrementBtn.style.width = "25%";
+    decrementBtn.style.height = "25%";
+    decrementBtn.type = "button";
+    decrementBtn.textContent = "-";
+    decrementBtn.onclick = () => this.changeSpinValue(code, -step, min, max);
 
-    const decrement = this.createButton("-", () => 
-      this.changeSpinValue(code, -step, min, max)
-    );
-    const increment = this.createButton("+", () => 
-      this.changeSpinValue(code, step, min, max)
-    );
+    const incrementBtn = this.createElement("button", "btn btn-primary");
+    incrementBtn.style.width = "25%";
+    incrementBtn.style.height = "25%";
+    incrementBtn.type = "button";
+    incrementBtn.textContent = "+";
+    incrementBtn.onclick = () => this.changeSpinValue(code, step, min, max);
 
-    spinBox.append(decrement, input, increment);
+    spinBox.append(decrementBtn, input, incrementBtn);
     wrapper.appendChild(spinBox);
     return wrapper;
   }
@@ -350,7 +362,8 @@ class UIManager {
     const resetDiv = this.createElement("div");
     const reset = this.createElement("input", "btn btn-secondary d-block mt-2 center content-style1");
     reset.type = "reset";
-    reset.onclick = (e) => this.handleReset(e);
+    reset.preventDefault = true;
+    reset.onclick = (e) => UIManager.handleReset();
     resetDiv.appendChild(reset);
 
     const getKeys = this.createElement("input", "btn btn-secondary d-block mt-2 center content-style1");
@@ -361,9 +374,7 @@ class UIManager {
     this.form.append(submitDiv, resetDiv, getKeys);
   }
 
-  handleReset(e) {
-    e.preventDefault();
-
+  static handleReset() {
     document.querySelectorAll(".reset").forEach(element => {
       if (element.id === "matchNumber") {
         const num = parseInt(element.value);
@@ -512,6 +523,8 @@ class FormHandler {
 
       if (response.ok) {
         console.log("Form submitted successfully");
+        UIManager.handleReset()
+        UIManager.scrollToTop();
       } else {
         console.error("Form submission failed:", response.status);
       }
@@ -581,11 +594,13 @@ class AppController {
   }
 
   setupEventListeners() {
+    document.getElementById("closeConfigBtn").addEventListener("click", () => this.uiManager.closeConfigSelector());
+
     document.getElementById("loadConfigBtn").addEventListener("click", async (e) => {
       e.preventDefault();
       const selectedConfig = document.getElementById("configSelect").value;
       appState.setConfigVersion(selectedConfig);
-      this.uiManager.scrollToTop();
+      UIManager.scrollToTop();
       await this.buildWebsite();
       await this.loadCompetitionRefs();
     });

@@ -4,7 +4,6 @@ function openEditModal(entryId) {
 
     editingEntry = entryId;
 
-    // Build form with entry data
     const formHtml = `
         <form id="editForm">
             <div class="form-group">
@@ -43,7 +42,6 @@ async function saveEdit() {
     const formData = new FormData(form);
     const updates = Object.fromEntries(formData);
 
-    // Remove readonly fields
     delete updates.teamNumber;
     delete updates.matchNumber;
 
@@ -73,12 +71,7 @@ async function saveEdit() {
 }
 
 async function deleteEntry(entryId) {
-    if (!confirm('Are you sure you want to delete this entry? This action cannot be undone.')) {
-        return;
-    }
-
     const reason = prompt('Please provide a reason for deletion:');
-    if (!reason) return;
 
     try {
         const response = await fetch(`${API_URL}/audit-delete-entry`, {
@@ -88,7 +81,7 @@ async function deleteEntry(entryId) {
                 dataPath: currentDataPath,
                 entryId,
                 editor: 'Web Audit Tool',
-                reason
+                reason: reason || 'No reason provided'
             })
         });
 

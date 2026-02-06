@@ -668,9 +668,9 @@ function compareScores(scoutAggregated, tbaScores, gameConfig) {
         matches: {
           total:
             (scoutAggregated.red.totals[pieceType] || 0) +
-              (scoutAggregated.blue.totals[pieceType] || 0) ===
+            (scoutAggregated.blue.totals[pieceType] || 0) ===
             (tbaScores.red.totals[pieceType] || 0) +
-              (tbaScores.blue.totals[pieceType] || 0),
+            (tbaScores.blue.totals[pieceType] || 0),
           red:
             (scoutAggregated.red.totals[pieceType] || 0) ===
             (tbaScores.red.totals[pieceType] || 0),
@@ -797,17 +797,6 @@ async function validateScoutEntry(entry, eventKey, year) {
       message: 'Entry missing timestamp',
       value: null,
     });
-  } else {
-    const entryTime = new Date(entry.timestamp).getTime();
-    const dayOld = Date.now() - 24 * 60 * 60 * 1000;
-    if (entryTime < dayOld) {
-      warnings.push({
-        severity: 'warning',
-        field: 'timestamp',
-        message: 'Entry is older than 24 hours',
-        value: new Date(entry.timestamp).toLocaleString(),
-      });
-    }
   }
 
   const scoreFields = Object.keys(entry).filter(

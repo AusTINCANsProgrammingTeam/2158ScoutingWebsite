@@ -27,7 +27,7 @@
                 },
                 {
                     "code": "AutoClimb",
-                    "title": "Did the robot climb during auto?",
+                    "title": "Climbed during Auto",
                     "type": "checkbox",
                     "defaultValue": false,
                     "required": false
