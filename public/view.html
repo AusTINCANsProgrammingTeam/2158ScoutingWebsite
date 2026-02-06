@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database and TBA</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/view.css">
+</head>
+
+<body>
+    <div class="main-container">
+        <div class="header">
+            <h1>Validate Data from Database</h1>
+            <p>Are our scouters accurate?</p>
+        </div>
+
+        <div class="controls">
+            <div class="control-group">
+                <label for="configSelect">Game Year:</label>
+                <select id="configSelect" class="form-select"></select>
+            </div>
+            <div class="control-group">
+                <label for="eventSelect">Event:</label>
+                <select id="eventSelect" class="form-select"></select>
+            </div>
+            <button id="runValidationBtn" class="btn btn-primary">Run Validation</button>
+            <button id="refreshBtn" class="btn btn-outline-secondary">Refresh</button>
+        </div>
+
+        <div id="eventInfo" class="event-info" style="display: none;">
+            <strong>Event:</strong> <span id="eventName"></span><br>
+            <strong>Teams:</strong> <span id="teamCount"></span> | <strong>Matches:</strong> <span id="matchCount"></span>
+        </div>
+
+        <div id="summarySection" style="display: none;">
+            <div class="validation-summary">
+                <div class="stat-card">
+                    <h3 id="totalEntries">0</h3>
+                    <p>Total Entries</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="validCount">0</h3>
+                    <p>Valid</p>
+                </div>
+                <div class="stat-card error">
+                    <h3 id="invalidCount">0</h3>
+                    <p>Invalid</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="warningCount">0</h3>
+                    <p>Warnings</p>
+                </div>
+            </div>
+
+            <div class="filters">
+                <button class="filter-btn active" data-filter="all">All Entries</button>
+                <button class="filter-btn" data-filter="errors">Has Errors</button>
+                <button class="filter-btn" data-filter="warnings">Has Warnings</button>
+                <button class="filter-btn" data-filter="valid">Valid Only</button>
+            </div>
+
+            <div class="entries-container" id="entriesContainer">
+            </div>
+        </div>
+
+        <div id="loadingState" class="loading">
+            <div class="spinner"></div>
+            <p>Ready to validate. Select an event and click "Run Validation"</p>
+        </div>
+    </div>
+
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span>Edit Entry</span>
+                <button class="close-btn" onclick="closeEditModal()">✕</button>
+            </div>
+            <div id="editFormContainer"></div>
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button class="btn btn-primary flex-grow-1" onclick="saveEdit()">Save Changes</button>
+                <button class="btn btn-secondary flex-grow-1" onclick="closeEditModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="historyModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span>Edit History</span>
+                <button class="close-btn" onclick="closeHistoryModal()">✕</button>
+            </div>
+            <div id="historyContainer"></div>
+        </div>
+    </div>
+
+    <!-- <script src="/js/audit-main.js"></script>
+    <script src="/js/audit-entry-management.js"></script> -->
+</body>
+
+</html>
